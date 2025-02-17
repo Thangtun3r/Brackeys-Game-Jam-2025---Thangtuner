@@ -4,6 +4,7 @@ public class Bullet : MonoBehaviour
 {
     public float speed = 10f;
     public float lifeTime = 2f;
+    public int damage = 10;
 
     private Rigidbody2D rb;
 
@@ -23,7 +24,7 @@ public class Bullet : MonoBehaviour
         IDamageable damageable = collision.gameObject.GetComponent<IDamageable>();
         if (damageable != null)
         {
-            damageable.TakeDamage(10f);
+            damageable.TakeDamage(damage);
         }
 
         gameObject.SetActive(false); // Return to pool on any collision

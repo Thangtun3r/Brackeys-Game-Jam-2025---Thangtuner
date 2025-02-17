@@ -13,6 +13,11 @@ public class EnemyAIPathFollower : MonoBehaviour
     private bool isMoving = false;
     private EnemySpawner spawner;
 
+    public EnemySpawner GetSpawner()
+    {
+        return spawner;
+    }
+
     public void SetPath(List<Vector3Int> pathCells, EnemySpawner assignedSpawner)
     {
         if (pathCells == null || pathCells.Count == 0)
