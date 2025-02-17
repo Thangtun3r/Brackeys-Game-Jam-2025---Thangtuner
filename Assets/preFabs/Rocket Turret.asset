@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aaf2ea1bf074ee541b61a577546ab9b3, type: 3}
+  m_Name: Rocket Turret
+  m_EditorClassIdentifier: 
+  turretPrefab: {fileID: 5862858502445271555, guid: a5e09895b4ed90f4b93adea1e9c6089d, type: 3}
+  previewSprite: {fileID: 0}
+  cost: 30
+  range: 0
+  fireRate: 0
