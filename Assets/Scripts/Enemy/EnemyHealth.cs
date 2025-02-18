@@ -5,8 +5,8 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     [HideInInspector]
     public bool hasBeenCounted = false;
     [Header("Enemy Health Settings")]
-    public int maxHealth = 100;
-    private int currentHealth;
+    public float maxHealth = 100;
+    private float currentHealth;
 
     private EnemyAIPathFollower aiPathFollower;
     private int poolIndex;
@@ -25,7 +25,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         aiPathFollower = GetComponent<EnemyAIPathFollower>();
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         currentHealth -= damage;
         Debug.Log($"{gameObject.name} took {damage} damage. Remaining health: {currentHealth}");

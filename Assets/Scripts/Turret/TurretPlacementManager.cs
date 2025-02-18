@@ -43,62 +43,73 @@ public class TurretPlacementManager : MonoBehaviour
     }
 
     private void Update() {
-        // Handle turret placement if a turret is selected
-        if (selectedTurretData != null) {
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            // Get the cell under the mouse – treat it as the bottom-left of a 2x2 area.
-            Vector3Int gridPos = allowedTilemap.WorldToCell(mouseWorldPos);
+        if (BulldozeMode.bulldozeMode == false)
+        {
+            // Handle turret placement if a turret is selected
+            if (selectedTurretData != null) {
+                Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                // Get the cell under the mouse – treat it as the bottom-left of a 2x2 area.
+                Vector3Int gridPos = allowedTilemap.WorldToCell(mouseWorldPos);
 
-            // Calculate the center of the bottom-left cell…
-            Vector3 cellCenter = allowedTilemap.GetCellCenterWorld(gridPos);
-            // …then offset by half the cell size to get the center of the 2x2 block.
-            Vector3 offset = allowedTilemap.layoutGrid.cellSize / 2f;
-            Vector3 placementCenter = cellCenter + offset;
+                // Calculate the center of the bottom-left cell…
+                Vector3 cellCenter = allowedTilemap.GetCellCenterWorld(gridPos);
+                // …then offset by half the cell size to get the center of the 2x2 block.
+                Vector3 offset = allowedTilemap.layoutGrid.cellSize / 2f;
+                Vector3 placementCenter = cellCenter + offset;
 
-            // Update the preview's position
-            if (currentPreview != null)
-                currentPreview.transform.position = placementCenter;
+                // Update the preview's position
+                if (currentPreview != null)
+                    currentPreview.transform.position = placementCenter;
 
-            // Check if all four cells in the 2x2 block are available
-            bool isValidPlacement = IsAreaAvailable(gridPos);
+                // Check if all four cells in the 2x2 block are available
+                bool isValidPlacement = IsAreaAvailable(gridPos);
 
-            // Provide visual feedback using the preview's color (if it has a SpriteRenderer)
-            if (currentPreview != null) {
-                SpriteRenderer sr = currentPreview.GetComponent<SpriteRenderer>();
-                if (sr != null)
-                    sr.color = isValidPlacement ? Color.green : Color.red;
-            }
+                // Provide visual feedback using the preview's color (if it has a SpriteRenderer)
+                if (currentPreview != null) {
+                    SpriteRenderer sr = currentPreview.GetComponent<SpriteRenderer>();
+                    if (sr != null)
+                        sr.color = isValidPlacement ? Color.green : Color.red;
+                }
 
-            // Left-click to place turret if the area is valid
-            if (isValidPlacement && Input.GetMouseButtonDown(0)) {
-                PlaceTurret(gridPos, placementCenter);
+                // Left-click to place turret if the area is valid
+                if (isValidPlacement && Input.GetMouseButtonDown(0)) {
+                    PlaceTurret(gridPos, placementCenter);
+                }
             }
         }
+        
 
         // Right-click to remove (bulldoze) a turret and refund its cost
-        if (Input.GetMouseButtonDown(1)) {
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3Int gridPos = allowedTilemap.WorldToCell(mouseWorldPos);
-            if (placedTurrets.ContainsKey(gridPos)) {
-                GameObject turretToRemove = placedTurrets[gridPos];
-                Turret turretComponent = turretToRemove.GetComponent<Turret>();
-                if (turretComponent != null && turretComponent.turretData != null) {
-                    ResourceManager.Instance.AddCoins(turretComponent.turretData.cost);
-                    Debug.Log($"Refunded {turretComponent.turretData.cost} coins.");
-                }
-                // Remove the turret from all occupied cells
-                List<Vector3Int> keysToRemove = new List<Vector3Int>();
-                foreach (var kvp in placedTurrets)
-                {
-                    if (kvp.Value == turretToRemove)
-                        keysToRemove.Add(kvp.Key);
-                }
-                foreach (var key in keysToRemove)
-                    placedTurrets.Remove(key);
+        if(BulldozeMode.bulldozeMode == true)
+        {
+            Destroy(currentPreview);
+            currentPreview = null;
+            if (Input.GetMouseButtonDown(0)) {
+                Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Vector3Int gridPos = allowedTilemap.WorldToCell(mouseWorldPos);
+                if (placedTurrets.ContainsKey(gridPos)) {
+                    GameObject turretToRemove = placedTurrets[gridPos];
+                    Turret turretComponent = turretToRemove.GetComponent<Turret>();
+                    if (turretComponent != null && turretComponent.turretData != null) {
+                        ResourceManager.Instance.AddCoins(turretComponent.turretData.cost);
+                        Debug.Log($"Refunded {turretComponent.turretData.cost} coins.");
+                    }
+                    // Remove the turret from all occupied cells
+                    List<Vector3Int> keysToRemove = new List<Vector3Int>();
+                    foreach (var kvp in placedTurrets)
+                    {
+                        if (kvp.Value == turretToRemove)
+                            keysToRemove.Add(kvp.Key);
+                    }
+                    foreach (var key in keysToRemove)
+                        placedTurrets.Remove(key);
 
-                Destroy(turretToRemove);
+                    Destroy(turretToRemove);
+                }
             }
         }
+        
+        
     }
 
     /// <summary>

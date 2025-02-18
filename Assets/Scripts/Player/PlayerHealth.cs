@@ -1,12 +1,12 @@
 using UnityEngine;
 
-public class PlayerHealth : MonoBehaviour
+public class PlayerHealth : MonoBehaviour, IDamageable
 {
     [Header("Health Settings")]
-    public int maxHealth = 100;
-    private int currentHealth;
+    public float maxHealth = 100f;
+    private float currentHealth;
 
-    public delegate void HealthChanged(int currentHealth);
+    public delegate void HealthChanged(float currentHealth);
     public event HealthChanged OnHealthChanged;
 
     void Start()
@@ -14,12 +14,10 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         currentHealth -= damage;
-        OnHealthChanged?.Invoke(currentHealth);
-        Debug.Log($"Player took {damage} damage. Current Health: {currentHealth}");
-
+        Debug.Log($"{gameObject.name} took {damage} damage. Remaining health: {currentHealth}");
         if (currentHealth <= 0)
         {
             Die();
@@ -29,6 +27,6 @@ public class PlayerHealth : MonoBehaviour
     void Die()
     {
         Debug.Log("Player has died!");
-        gameObject.SetActive(false); // Disable player on death (You can replace with respawn logic)
+        gameObject.SetActive(false); // Disable player on death (Can be replaced with respawn logic)
     }
 }

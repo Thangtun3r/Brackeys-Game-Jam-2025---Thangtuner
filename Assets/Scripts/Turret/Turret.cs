@@ -7,7 +7,7 @@ public class Turret : MonoBehaviour, IDamageable
     public TurretData turretData;
 
     [Header("Turret Settings")]
-    public int health = 100;
+    public float health = 100;
     public float fireRate = 1f;
     public float detectionRange = 10f;
     public Transform firePoint;
@@ -58,7 +58,7 @@ public class Turret : MonoBehaviour, IDamageable
     }
 
     // Implementing IDamageable
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         health -= damage;
         if (health <= 0)
