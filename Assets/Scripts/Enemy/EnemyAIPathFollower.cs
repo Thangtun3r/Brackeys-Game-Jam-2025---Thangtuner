@@ -12,13 +12,14 @@ public class EnemyAIPathFollower : MonoBehaviour
     private int currentWaypointIndex = 0;
     private bool isMoving = false;
     private EnemySpawner spawner;
+    private int poolIndex; // Store the pool index
 
     public EnemySpawner GetSpawner()
     {
         return spawner;
     }
 
-    public void SetPath(List<Vector3Int> pathCells, EnemySpawner assignedSpawner)
+    public void SetPath(List<Vector3Int> pathCells, EnemySpawner assignedSpawner, int assignedPoolIndex)
     {
         if (pathCells == null || pathCells.Count == 0)
         {
@@ -36,6 +37,7 @@ public class EnemyAIPathFollower : MonoBehaviour
         currentWaypointIndex = 1;
         isMoving = true;
         spawner = assignedSpawner;
+        poolIndex = assignedPoolIndex; // Store the pool index
     }
 
     void Update()
@@ -58,7 +60,16 @@ public class EnemyAIPathFollower : MonoBehaviour
             // Enemy reached destination → Return to Pool
             isMoving = false;
             spawner.EnemyDestroyed();
-            FindObjectOfType<EnemyObjectPool>().ReturnEnemyToPool(gameObject);
+
+            EnemyObjectPool enemyPool = FindObjectOfType<EnemyObjectPool>();
+            if (enemyPool != null)
+            {
+                enemyPool.ReturnEnemyToPool(gameObject, poolIndex); // Now passing poolIndex correctly
+            }
+            else
+            {
+                Debug.LogWarning("EnemyObjectPool not found in scene!");
+            }
         }
     }
 }

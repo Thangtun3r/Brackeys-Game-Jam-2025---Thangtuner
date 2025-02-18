@@ -4,44 +4,49 @@ using UnityEngine;
 public class EnemyObjectPool : MonoBehaviour
 {
     [Header("Pooling Settings")]
-    public GameObject enemyPrefab;
+    public GameObject[] enemyPrefabs; // Array of enemy prefabs
     public int poolSize = 10;
 
-    private Queue<GameObject> enemyPool = new Queue<GameObject>();
+    private Dictionary<int, Queue<GameObject>> enemyPools = new Dictionary<int, Queue<GameObject>>();
 
     void Start()
     {
-        InitializePool();
+        InitializePools();
     }
 
-    void InitializePool()
+    void InitializePools()
     {
-        for (int i = 0; i < poolSize; i++)
+        for (int i = 0; i < enemyPrefabs.Length; i++)
         {
-            GameObject enemy = Instantiate(enemyPrefab);
-            enemy.SetActive(false);
-            enemyPool.Enqueue(enemy);
+            enemyPools[i] = new Queue<GameObject>();
+
+            for (int j = 0; j < poolSize; j++)
+            {
+                GameObject enemy = Instantiate(enemyPrefabs[i]);
+                enemy.SetActive(false);
+                enemyPools[i].Enqueue(enemy);
+            }
         }
     }
 
-    public GameObject GetEnemyFromPool()
+    public GameObject GetEnemyFromPool(int poolIndex)
     {
-        if (enemyPool.Count > 0)
+        if (enemyPools.ContainsKey(poolIndex) && enemyPools[poolIndex].Count > 0)
         {
-            GameObject enemy = enemyPool.Dequeue();
+            GameObject enemy = enemyPools[poolIndex].Dequeue();
             enemy.SetActive(true);
             return enemy;
         }
         else
         {
-            Debug.LogWarning("Enemy Pool exhausted! Consider increasing pool size.");
+            Debug.LogWarning($"Enemy Pool {poolIndex} exhausted! Consider increasing pool size.");
             return null;
         }
     }
 
-    public void ReturnEnemyToPool(GameObject enemy)
+    public void ReturnEnemyToPool(GameObject enemy, int poolIndex)
     {
         enemy.SetActive(false);
-        enemyPool.Enqueue(enemy);
+        enemyPools[poolIndex].Enqueue(enemy);
     }
 }

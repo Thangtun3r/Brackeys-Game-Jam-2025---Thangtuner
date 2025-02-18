@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -19,21 +20,24 @@ public class TilemapAStarPathfinder : MonoBehaviour
 
     // List to record all painted cells.
     private List<Vector3Int> paintedCells = new List<Vector3Int>();
+    public event Action OnPathValidated; // Event to notify readiness
+    public static bool pathValid = false;
+    public static bool placeAble = false;
 
     void Update()
     {
         HandleMouseInput();
 
         // Press space to validate and start the pathfinding process.
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            ValidateAndStartPath();
-        }
+        
+        ValidateAndStartPath();
     }
 
     void HandleMouseInput()
     {
-        // Left mouse button: paint while held.
+        if (placeAble == true)
+        {
+            // Left mouse button: paint while held.
         if (Input.GetMouseButton(0))
         {
             // Enforce maximum paint length.
@@ -83,6 +87,8 @@ public class TilemapAStarPathfinder : MonoBehaviour
                 paintedCells.Remove(cellPos);
             }
         }
+        }
+        
     }
 
     bool IsWithinAllowedArea(Vector3Int cellPos)
@@ -195,11 +201,14 @@ public class TilemapAStarPathfinder : MonoBehaviour
             {
                 Debug.Log("Invalid placing: " + err);
             }
+            pathValid = false;
         }
         else
         {
-            Debug.Log("Path valid. Assigning to spawner.");
+            Debug.Log("path valid");
+            pathValid = true;
             enemySpawner.SetPath(orderedPath);
+            //OnPathValidated?.Invoke();
         }
     }
 }

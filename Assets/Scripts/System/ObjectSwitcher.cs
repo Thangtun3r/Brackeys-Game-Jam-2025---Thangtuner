@@ -2,20 +2,9 @@ using UnityEngine;
 
 public class ObjectSwitcher : MonoBehaviour
 {
-    public GameObject pathfinder;
-    public GameObject turretButtonUI;
+    public GameObject turretButtonUI; // ✅ Assign UI button in the Inspector
 
     private bool isPathfinderActive = true;
-
-    void Start()
-    {
-        // Ensure only one object is active at the start
-        if (pathfinder != null && turretButtonUI != null)
-        {
-            pathfinder.SetActive(true);
-            turretButtonUI.SetActive(false);
-        }
-    }
 
     void Update()
     {
@@ -28,11 +17,15 @@ public class ObjectSwitcher : MonoBehaviour
 
     void ToggleObjects()
     {
-        if (pathfinder != null && turretButtonUI != null)
+        // Toggle the `placeAble` state in TilemapAStarPathfinder
+        TilemapAStarPathfinder.placeAble = !TilemapAStarPathfinder.placeAble;
+
+        // Toggle UI visibility
+        if (turretButtonUI != null)
         {
-            isPathfinderActive = !isPathfinderActive;
-            pathfinder.SetActive(isPathfinderActive);
-            turretButtonUI.SetActive(!isPathfinderActive);
+            turretButtonUI.SetActive(!TilemapAStarPathfinder.placeAble);
         }
+
+        Debug.Log($"Toggled: placeAble = {TilemapAStarPathfinder.placeAble}, UI Active = {!TilemapAStarPathfinder.placeAble}");
     }
 }

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5373242800350351487}
   - component: {fileID: 3207781426441781399}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: Enemy Tank
   m_TagString: Damageable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 13
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.96556985, b: 0.27987415, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
