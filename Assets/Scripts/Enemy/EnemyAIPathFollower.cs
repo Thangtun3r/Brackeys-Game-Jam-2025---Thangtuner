@@ -4,6 +4,8 @@ using UnityEngine.Tilemaps;
 
 public class EnemyAIPathFollower : MonoBehaviour
 {
+    [HideInInspector]
+    public bool hasBeenCounted = false;
     [Header("References")]
     public Tilemap baseTilemap;
     public float moveSpeed = 2f;
@@ -12,7 +14,7 @@ public class EnemyAIPathFollower : MonoBehaviour
     private int currentWaypointIndex = 0;
     private bool isMoving = false;
     private EnemySpawner spawner;
-    private int poolIndex; // Store the pool index
+    private int poolIndex;
 
     public EnemySpawner GetSpawner()
     {
@@ -26,18 +28,16 @@ public class EnemyAIPathFollower : MonoBehaviour
             Debug.LogWarning("EnemyAI: No path provided.");
             return;
         }
-
         worldWaypoints = new List<Vector3>();
         foreach (Vector3Int cell in pathCells)
         {
             worldWaypoints.Add(baseTilemap.GetCellCenterWorld(cell));
         }
-
         transform.position = worldWaypoints[0];
         currentWaypointIndex = 1;
         isMoving = true;
         spawner = assignedSpawner;
-        poolIndex = assignedPoolIndex; // Store the pool index
+        poolIndex = assignedPoolIndex;
     }
 
     void Update()
@@ -49,7 +49,6 @@ public class EnemyAIPathFollower : MonoBehaviour
         {
             Vector3 targetPos = worldWaypoints[currentWaypointIndex];
             transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
-
             if (Vector3.Distance(transform.position, targetPos) < 0.1f)
             {
                 currentWaypointIndex++;
@@ -57,14 +56,19 @@ public class EnemyAIPathFollower : MonoBehaviour
         }
         else
         {
-            // Enemy reached destination → Return to Pool
+            // Enemy has reached its destination.
             isMoving = false;
-            spawner.EnemyDestroyed();
-
+            // Ensure that we only notify the spawner once:
+            EnemyHealth health = GetComponent<EnemyHealth>();
+            if (health != null && !health.hasBeenCounted)
+            {
+                health.hasBeenCounted = true;
+                spawner.EnemyDestroyed(poolIndex);
+            }
             EnemyObjectPool enemyPool = FindObjectOfType<EnemyObjectPool>();
             if (enemyPool != null)
             {
-                enemyPool.ReturnEnemyToPool(gameObject, poolIndex); // Now passing poolIndex correctly
+                enemyPool.ReturnEnemyToPool(gameObject, poolIndex);
             }
             else
             {
@@ -72,4 +76,5 @@ public class EnemyAIPathFollower : MonoBehaviour
             }
         }
     }
+
 }

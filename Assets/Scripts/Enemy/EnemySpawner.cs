@@ -4,20 +4,25 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [Header("Spawner Settings")] 
-    public EnemyObjectPool enemyPool;
+    [Header("Spawner Settings")] public EnemyObjectPool enemyPool;
     public float spawnInterval = 3f;
 
-    public int poolOneCount = 10; // Number of enemies from pool 1
-    public int poolTwoCount = 10; // Number of enemies from pool 2
-    public int currentEnemyCount = 0; // ✅ Add this inside EnemySpawner class
+    // These are the fixed totals per wave (set by the WaveManager)
+    public int poolOneCount = 10; // Total enemies to spawn from pool 1
+    public int poolTwoCount = 10; // Total enemies to spawn from pool 2
 
+// Counters for how many enemies have been spawned (never decremented)
+    private int spawnedTotalPoolOne = 0;
 
-    private int spawnedFromPoolOne = 0;
-    private int spawnedFromPoolTwo = 0;
+    private int spawnedTotalPoolTwo = 0;
+
+// Counters for how many enemies are currently active (decremented once each enemy is removed)
+    private int activePoolOne = 0;
+    private int activePoolTwo = 0;
+
     private List<Vector3Int> pathToFollow;
     private Vector3Int startTile;
-    private bool isSpawning = false; // ✅ Prevents multiple coroutines from running
+    private bool isSpawning = false;
 
     public void SetPath(List<Vector3Int> path)
     {
@@ -28,54 +33,48 @@ public class EnemySpawner : MonoBehaviour
         }
 
         pathToFollow = path;
-        startTile = path[0]; // Set the first tile in the path as the spawn location
+        startTile = path[0];
     }
 
     public void StartWave(int newPoolOneCount, int newPoolTwoCount)
     {
-        if (isSpawning) return; // ✅ Prevents re-triggering while a wave is still active
-
+        if (isSpawning) return;
         poolOneCount = newPoolOneCount;
         poolTwoCount = newPoolTwoCount;
-
-        spawnedFromPoolOne = 0;
-        spawnedFromPoolTwo = 0;
-
+        spawnedTotalPoolOne = 0;
+        spawnedTotalPoolTwo = 0;
+        activePoolOne = 0;
+        activePoolTwo = 0;
         StartCoroutine(SpawnEnemies());
-
         Debug.Log($"Wave started! Spawning {poolOneCount} from Pool 1 and {poolTwoCount} from Pool 2.");
     }
 
-
     IEnumerator SpawnEnemies()
     {
-        isSpawning = true; // ✅ Prevents multiple coroutines from starting
-        int totalEnemies = poolOneCount + poolTwoCount;
-        int spawnedEnemies = 0; // ✅ Tracks how many enemies have been spawned
-
-        while (spawnedEnemies < totalEnemies) // ✅ Stops exactly when reaching totalEnemies
+        isSpawning = true;
+        while (spawnedTotalPoolOne < poolOneCount || spawnedTotalPoolTwo < poolTwoCount)
         {
             int poolIndex = -1;
-
-            if (spawnedFromPoolOne < poolOneCount && (spawnedFromPoolTwo >= poolTwoCount || Random.Range(0, 2) == 0))
+            // Choose which pool to spawn from (randomly if both are still below limit)
+            if (spawnedTotalPoolOne < poolOneCount && (spawnedTotalPoolTwo >= poolTwoCount || Random.Range(0, 2) == 0))
             {
                 poolIndex = 0;
-                spawnedFromPoolOne++;
+                spawnedTotalPoolOne++;
+                activePoolOne++;
             }
-            else if (spawnedFromPoolTwo < poolTwoCount)
+            else if (spawnedTotalPoolTwo < poolTwoCount)
             {
                 poolIndex = 1;
-                spawnedFromPoolTwo++;
+                spawnedTotalPoolTwo++;
+                activePoolTwo++;
             }
 
-            if (poolIndex == -1) break; // ✅ Exit if all enemies have been spawned
+            if (poolIndex == -1) break; // safeguard
 
-            // Spawn the enemy from the selected pool
             GameObject enemy = enemyPool.GetEnemyFromPool(poolIndex);
             if (enemy != null)
             {
                 EnemyAIPathFollower enemyAI = enemy.GetComponent<EnemyAIPathFollower>();
-
                 if (enemyAI.baseTilemap == null)
                 {
                     enemyAI.baseTilemap = FindObjectOfType<TilemapAStarPathfinder>().overlayTilemap;
@@ -83,28 +82,34 @@ public class EnemySpawner : MonoBehaviour
 
                 Vector3 spawnPosition = enemyAI.baseTilemap.GetCellCenterWorld(startTile);
                 enemy.transform.position = spawnPosition;
-
                 enemyAI.SetPath(pathToFollow, this, poolIndex);
-
-                spawnedEnemies++; // ✅ Correctly track spawned enemies
-                currentEnemyCount++; // ✅ Track active enemies
+                // Ensure the enemy’s health component knows its pool index
+                EnemyHealth health = enemy.GetComponent<EnemyHealth>();
+                if (health != null)
+                {
+                    health.SetPoolIndex(poolIndex);
+                }
             }
 
             yield return new WaitForSeconds(spawnInterval);
         }
 
-        isSpawning = false; // ✅ Mark spawning as finished
+        isSpawning = false;
     }
 
-
-    public void EnemyDestroyed()
+    public void EnemyDestroyed(int poolIndex)
     {
-        currentEnemyCount--; // ✅ Decrease only the active enemy count
+        if (poolIndex == 0)
+            activePoolOne--;
+        else if (poolIndex == 1)
+            activePoolTwo--;
 
-        if (currentEnemyCount <= 0) // ✅ Check when all active enemies are gone
+        Debug.Log(
+            $"Enemy destroyed from pool {poolIndex}. Active counts: Pool1: {activePoolOne}, Pool2: {activePoolTwo}");
+        // When both active counts reach zero, notify the WaveManager that Phase One is complete
+        if (activePoolOne <= 0 && activePoolTwo <= 0)
         {
-            FindObjectOfType<WaveManager>().OnWavePhaseOneComplete(); // Notify WaveManager
+            FindObjectOfType<WaveManager>().OnWavePhaseOneComplete();
         }
     }
-
 }

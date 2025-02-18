@@ -24,16 +24,16 @@ public class WaveManager : MonoBehaviour
     private int currentWaveIndex = 0; // ✅ Start at Wave 1 (0-based index)
     private bool waveReady = true;
     private bool phaseTwoActive = false;
-    private float timeLeft; // ✅ Track time left in Phase 2
+    private int timeLeft; // ✅ Track time left in Phase 2 (now an int)
 
     [Header("References")]
     public EnemySpawner enemySpawner;
     public TMP_Text waveNumberText; // ✅ Text for wave number
     public TMP_Text unitCountText;  // ✅ Text for Minions & Tanks count
 
-    public event Action OnWaveStart;
-    public event Action OnPhaseOneComplete;
-    public event Action OnWaveEnd;
+    public static event Action OnWaveStart;
+    public static event Action OnPhaseOneComplete;
+    public static event Action OnWaveEnd;
 
     /// <summary>
     /// UI Button OnClick() to start the **next wave in order**.
@@ -128,11 +128,16 @@ public class WaveManager : MonoBehaviour
         Debug.Log($"Phase 2 started for Wave {currentWaveIndex + 1}, lasting {duration} seconds.");
 
         phaseTwoActive = true;
-        timeLeft = duration; // ✅ Initialize countdown timer
+        timeLeft = Mathf.CeilToInt(duration); // ✅ Convert duration to an integer for countdown
 
         StartCoroutine(UpdatePhaseTwoUI()); // ✅ Start updating UI every second
 
-        yield return new WaitForSeconds(duration);
+        while (timeLeft > 0)
+        {
+            yield return new WaitForSeconds(1f);
+            timeLeft--;
+        }
+
         EndWave();
     }
 
@@ -145,11 +150,10 @@ public class WaveManager : MonoBehaviour
         {
             if (unitCountText != null)
             {
-                unitCountText.text = $"Survive for: {timeLeft:F1} seconds"; // ✅ Display countdown
+                unitCountText.text = $"Survive for: {timeLeft} seconds"; // ✅ Display rounded countdown
             }
 
             yield return new WaitForSeconds(1f);
-            timeLeft--; // ✅ Reduce time left
         }
     }
 

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6943258088920656798}
   - component: {fileID: 4945888446055476554}
   - component: {fileID: 7961132004243864810}
+  - component: {fileID: 4426954678363370889}
   m_Layer: 0
   m_Name: Base Turret
   m_TagString: Untagged
@@ -99,7 +100,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   turretData: {fileID: 11400000, guid: aff31edd48202a1488e6806a89ecf8e3, type: 2}
-  health: 100
+  health: 2
   fireRate: 1
   detectionRange: 10
   firePoint: {fileID: 5612981648355493549}
@@ -108,6 +109,52 @@ MonoBehaviour:
   enemyTag: Damageable
   maxBulletsPerReload: 5
   reloadTime: 3
+  rotationSpeed: 5
+--- !u!61 &4426954678363370889
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 505775247686696148}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
 --- !u!1 &2059620578787173092
 GameObject:
   m_ObjectHideFlags: 0

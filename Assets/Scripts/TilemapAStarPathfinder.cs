@@ -27,68 +27,75 @@ public class TilemapAStarPathfinder : MonoBehaviour
     void Update()
     {
         HandleMouseInput();
-
-        // Press space to validate and start the pathfinding process.
-        
         ValidateAndStartPath();
     }
 
     void HandleMouseInput()
     {
-        if (placeAble == true)
+        if (placeAble)
         {
             // Left mouse button: paint while held.
-        if (Input.GetMouseButton(0))
-        {
-            // Enforce maximum paint length.
-            if (paintedCells.Count >= requiredPathLength)
+            if (Input.GetMouseButton(0))
             {
-                Debug.Log("Cannot paint: required path length reached.");
-                return;
-            }
-            Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3Int cellPos = overlayTilemap.WorldToCell(worldPos);
-
-            if (IsWithinAllowedArea(cellPos) && !IsCellPainted(cellPos))
-            {
-                // Temporarily add the tile for checking.
-                paintedCells.Add(cellPos);
-                overlayTilemap.SetTile(cellPos, pathTile);
-
-                // Check if this move created a 2x2 block.
-                if (Has2x2Block(paintedCells))
+                // Enforce maximum paint length.
+                if (paintedCells.Count >= requiredPathLength)
                 {
-                    // Undo the placement and notify the player.
-                    overlayTilemap.SetTile(cellPos, null);
-                    paintedCells.Remove(cellPos);
-                    Debug.Log("Cannot paint: placing this tile creates a 2x2 block.");
+                    Debug.Log("Cannot paint: required path length reached.");
                     return;
                 }
+                Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Vector3Int cellPos = overlayTilemap.WorldToCell(worldPos);
 
-                // Check if this move creates an intersection.
-                if (HasIntersection(paintedCells))
+                // Check: within allowed area, not already painted, and not occupied by a turret.
+                if (IsWithinAllowedArea(cellPos) && !IsCellPainted(cellPos) && !IsCellOccupiedByTurret(cellPos))
                 {
-                    // Undo the placement and notify the player.
+                    // Temporarily add the tile for checking.
+                    paintedCells.Add(cellPos);
+                    overlayTilemap.SetTile(cellPos, pathTile);
+
+                    // Check if this move created a 2x2 block.
+                    if (Has2x2Block(paintedCells))
+                    {
+                        // Undo the placement and notify the player.
+                        overlayTilemap.SetTile(cellPos, null);
+                        paintedCells.Remove(cellPos);
+                        Debug.Log("Cannot paint: placing this tile creates a 2x2 block.");
+                        return;
+                    }
+
+                    // Check if this move creates an intersection.
+                    if (HasIntersection(paintedCells))
+                    {
+                        // Undo the placement and notify the player.
+                        overlayTilemap.SetTile(cellPos, null);
+                        paintedCells.Remove(cellPos);
+                        Debug.Log("Cannot paint: placing this tile would create an intersection.");
+                    }
+                }
+            }
+
+            // Right mouse button: erase while held.
+            if (Input.GetMouseButton(1))
+            {
+                Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Vector3Int cellPos = overlayTilemap.WorldToCell(worldPos);
+                if (IsWithinAllowedArea(cellPos) && IsCellPainted(cellPos))
+                {
                     overlayTilemap.SetTile(cellPos, null);
                     paintedCells.Remove(cellPos);
-                    Debug.Log("Cannot paint: placing this tile would create an intersection.");
                 }
             }
         }
+    }
 
-        // Right mouse button: erase while held.
-        if (Input.GetMouseButton(1))
+    // New helper method: checks if a cell is occupied by a turret.
+    bool IsCellOccupiedByTurret(Vector3Int cellPos)
+    {
+        if (TurretPlacementManager.Instance != null)
         {
-            Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3Int cellPos = overlayTilemap.WorldToCell(worldPos);
-            if (IsWithinAllowedArea(cellPos) && IsCellPainted(cellPos))
-            {
-                overlayTilemap.SetTile(cellPos, null);
-                paintedCells.Remove(cellPos);
-            }
+            return TurretPlacementManager.Instance.IsCellOccupied(cellPos);
         }
-        }
-        
+        return false;
     }
 
     bool IsWithinAllowedArea(Vector3Int cellPos)
@@ -175,7 +182,7 @@ public class TilemapAStarPathfinder : MonoBehaviour
         {
             int neighborCount = GetNeighborCount(cell, set);
             if (neighborCount > 2)
-                return true; // More than 2 neighbors = intersection.
+                return true;
         }
         return false;
     }

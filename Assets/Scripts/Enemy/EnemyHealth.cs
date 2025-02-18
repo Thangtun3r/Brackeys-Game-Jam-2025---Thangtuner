@@ -2,17 +2,21 @@ using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour, IDamageable
 {
+    [HideInInspector]
+    public bool hasBeenCounted = false;
     [Header("Enemy Health Settings")]
     public int maxHealth = 100;
     private int currentHealth;
 
     private EnemyAIPathFollower aiPathFollower;
-    private EnemySpawner spawner;
-    private int poolIndex; // Store the enemy's pool index
+    private int poolIndex;
+    private bool isPartOfWave = false; // Mark if this enemy belongs to the current wave
 
     public EnemySpawner GetSpawner()
     {
-        return spawner;
+        if (aiPathFollower != null)
+            return aiPathFollower.GetSpawner();
+        return null;
     }
 
     void Awake()
@@ -25,7 +29,6 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     {
         currentHealth -= damage;
         Debug.Log($"{gameObject.name} took {damage} damage. Remaining health: {currentHealth}");
-
         if (currentHealth <= 0)
         {
             Die();
@@ -35,24 +38,20 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     private void Die()
     {
         Debug.Log($"{gameObject.name} has been destroyed!");
-
-        // Get reference to EnemyAIPathFollower
-        EnemyAIPathFollower aiPathFollower = GetComponent<EnemyAIPathFollower>();
-        if (aiPathFollower != null)
+        // Only count removal once.
+        if (!hasBeenCounted)
         {
-            // Use the public getter to retrieve the spawner
-            EnemySpawner spawner = aiPathFollower.GetSpawner();
-            if (spawner != null)
+            hasBeenCounted = true;
+            EnemySpawner spawner = GetSpawner();
+            if (spawner != null && isPartOfWave)
             {
-                spawner.EnemyDestroyed();
+                spawner.EnemyDestroyed(poolIndex);
             }
         }
-
-        // Return enemy to object pool
         EnemyObjectPool enemyPool = FindObjectOfType<EnemyObjectPool>();
         if (enemyPool != null)
         {
-            enemyPool.ReturnEnemyToPool(gameObject, poolIndex);  // Now passing the pool index
+            enemyPool.ReturnEnemyToPool(gameObject, poolIndex);
         }
         else
         {
@@ -60,14 +59,16 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         }
     }
 
-    // Reset health and ensure correct pool index when reactivated from the pool
     private void OnEnable()
     {
         currentHealth = maxHealth;
+        isPartOfWave = true;
+        hasBeenCounted = false;
     }
 
     public void SetPoolIndex(int index)
     {
-        poolIndex = index;  // Set the pool index when spawning
+        poolIndex = index;
     }
+
 }
