@@ -215,8 +215,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d585f864f41c0dd4ea39cd83d83d3944, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  grid: {fileID: 88002847}
-  tilemap: {fileID: 814358365}
 --- !u!1 &241845306
 GameObject:
   m_ObjectHideFlags: 0
@@ -627,7 +625,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5.52
+  orthographic size: 6.65
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

@@ -99,7 +99,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseTilemap: {fileID: 0}
-  moveSpeed: 2
 --- !u!114 &3207781426441781399
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,4 +111,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0a405261bebf1a418e2a2a87613f58a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 30
+  enemyStats: {fileID: 11400000, guid: 4947f74750d1b924ba2b6233afd8866a, type: 2}

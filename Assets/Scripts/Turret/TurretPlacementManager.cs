@@ -22,6 +22,15 @@ public class TurretPlacementManager : MonoBehaviour
         else
             Destroy(gameObject);
     }
+    
+    // When this component is disabled, also remove the preview object
+    private void OnDisable() {
+        if (currentPreview != null)
+        {
+            Destroy(currentPreview);
+            currentPreview = null;
+        }
+    }
 
     private void Update() {
         // Handle turret placement if a turret is selected
@@ -55,7 +64,6 @@ public class TurretPlacementManager : MonoBehaviour
             Vector3Int gridPos = allowedTilemap.WorldToCell(mouseWorldPos);
             if (placedTurrets.ContainsKey(gridPos)) {
                 GameObject turretToRemove = placedTurrets[gridPos];
-                // Try to get the turret's data from a component on the turret
                 Turret turretComponent = turretToRemove.GetComponent<Turret>();
                 if (turretComponent != null && turretComponent.turretData != null) {
                     ResourceManager.Instance.AddCoins(turretComponent.turretData.cost);
@@ -106,7 +114,11 @@ public class TurretPlacementManager : MonoBehaviour
         GameObject newTurret = Instantiate(selectedTurretData.turretPrefab, cellCenter, Quaternion.identity);
         placedTurrets.Add(gridPos, newTurret);
 
-        // Turret selection remains active for continuous placement
+        // Optionally, you can also assign the turretData to a Turret component on the new turret
+        Turret turretComponent = newTurret.GetComponent<Turret>();
+        if(turretComponent != null) {
+            turretComponent.turretData = selectedTurretData;
+        }
     }
 
     /// <summary>
