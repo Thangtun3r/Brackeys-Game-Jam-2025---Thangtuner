@@ -15,10 +15,17 @@ public class EnemyAIPathFollower : MonoBehaviour
     private bool isMoving = false;
     private EnemySpawner spawner;
     private int poolIndex;
+    private SpriteRenderer spriteRenderer;
 
     public EnemySpawner GetSpawner()
     {
         return spawner;
+    }
+
+    void Start()
+    {
+        // Initialize the sprite renderer
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     public void SetPath(List<Vector3Int> pathCells, EnemySpawner assignedSpawner, int assignedPoolIndex)
@@ -48,7 +55,16 @@ public class EnemyAIPathFollower : MonoBehaviour
         if (currentWaypointIndex < worldWaypoints.Count)
         {
             Vector3 targetPos = worldWaypoints[currentWaypointIndex];
+        
+            // Determine horizontal movement direction
+            float diffX = targetPos.x - transform.position.x;
+            if (diffX < 0)
+                spriteRenderer.flipX = true;  // Flip to face left
+            else if (diffX > 0)
+                spriteRenderer.flipX = false; // Face right
+
             transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
+        
             if (Vector3.Distance(transform.position, targetPos) < 0.1f)
             {
                 currentWaypointIndex++;

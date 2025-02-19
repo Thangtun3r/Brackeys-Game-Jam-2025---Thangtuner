@@ -192,9 +192,9 @@ GameObject:
   - component: {fileID: -4610417322911943540}
   - component: {fileID: 2170766581462838139}
   - component: {fileID: -7278346451941984328}
-  - component: {fileID: 7869388090154386063}
+  - component: {fileID: 2710055430889851185}
   m_Layer: 8
-  m_Name: Enemy
+  m_Name: Tank
   m_TagString: Damageable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -210,7 +210,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.83150446, y: 0.83150446, z: 0.83150446}
+  m_LocalScale: {x: 0.7047, y: 0.7047, z: 0.7047}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6667645464693845277}
@@ -257,7 +257,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 13
-  m_Sprite: {fileID: 809533321, guid: 38c6a2e4fe9910247bdf2de939a36f28, type: 3}
+  m_Sprite: {fileID: -848552971, guid: 4f0600186786e354bb5f3fc7ef746d8b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -373,7 +373,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!95 &7869388090154386063
+--- !u!95 &2710055430889851185
 Animator:
   serializedVersion: 5
   m_ObjectHideFlags: 0
@@ -383,7 +383,7 @@ Animator:
   m_GameObject: {fileID: 7873391419685451219}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 2a0a3c6817fa7a444bfde0e5b34d7092, type: 2}
+  m_Controller: {fileID: 9100000, guid: df1bf71757dcd794e90be6b2fa46688c, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

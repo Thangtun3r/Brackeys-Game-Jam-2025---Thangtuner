@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour, IDamageable,IHealable
@@ -5,6 +6,8 @@ public class PlayerHealth : MonoBehaviour, IDamageable,IHealable
     [Header("Health Settings")]
     public float maxHealth = 100f;
     private float currentHealth;
+    public static Action OnPlayerDeath;
+
 
     public delegate void HealthChanged(float currentHealth);
     public event HealthChanged OnHealthChanged;
@@ -29,13 +32,9 @@ public class PlayerHealth : MonoBehaviour, IDamageable,IHealable
         Debug.Log($"{gameObject.name} took {damage} damage. Remaining health: {currentHealth}");
         if (currentHealth <= 0)
         {
-            Die();
+            OnPlayerDeath.Invoke();
         }
     }
 
-    void Die()
-    {
-        Debug.Log("Player has died!");
-        gameObject.SetActive(false); // Disable player on death (Can be replaced with respawn logic)
-    }
+    
 }
