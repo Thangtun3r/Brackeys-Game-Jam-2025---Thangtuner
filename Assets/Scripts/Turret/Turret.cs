@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Turret : MonoBehaviour, IDamageable
 {
-    public TurretData turretData;
+    
 
     [Header("Turret Settings")]
     public float health = 100;

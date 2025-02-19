@@ -115,7 +115,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hasBeenCounted: 0
-  maxHealth: 100
+  maxHealth: 4
+  coinValue: 1
 --- !u!58 &3489787979626943102
 CircleCollider2D:
   m_ObjectHideFlags: 0

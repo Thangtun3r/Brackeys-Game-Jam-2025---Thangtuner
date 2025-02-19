@@ -1,8 +1,11 @@
+using System;
+using TMPro;
 using UnityEngine;
 
 public class ResourceManager : MonoBehaviour
 {
     public static ResourceManager Instance { get; private set; }
+    public TextMeshProUGUI coinsText;
 
     public int _coins;
 
@@ -17,6 +20,11 @@ public class ResourceManager : MonoBehaviour
         {
             Destroy(gameObject); // Prevent duplicate instances
         }
+    }
+
+    private void Update()
+    {
+        coinsText.text = _coins.ToString();
     }
 
     public int GetCoins()

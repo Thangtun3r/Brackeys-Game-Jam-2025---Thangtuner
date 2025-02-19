@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4945888446055476554}
   - component: {fileID: 7961132004243864810}
   - component: {fileID: 4426954678363370889}
+  - component: {fileID: 7901617214940970490}
   m_Layer: 0
   m_Name: Base Turret
   m_TagString: Untagged
@@ -99,7 +100,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb411057014b02549844c1b7178c9a9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turretData: {fileID: 11400000, guid: aff31edd48202a1488e6806a89ecf8e3, type: 2}
   health: 2
   fireRate: 1
   detectionRange: 10
@@ -155,6 +155,21 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &7901617214940970490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 505775247686696148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4b541140f101274ba76507adbd4541c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  normalRefundCost: 10
+  nonRefundableRefundCost: 5
+  isRefundable: 1
 --- !u!1 &2059620578787173092
 GameObject:
   m_ObjectHideFlags: 0
@@ -250,6 +265,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6806366788463059044}
   - component: {fileID: 8415749475585573383}
+  - component: {fileID: 1524070747572975047}
   m_Layer: 0
   m_Name: Turret
   m_TagString: Untagged
@@ -325,6 +341,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1524070747572975047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5862858502445271555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4b541140f101274ba76507adbd4541c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  normalRefundCost: 10
+  nonRefundableRefundCost: 5
+  isRefundable: 1
 --- !u!1 &8860372188072528768
 GameObject:
   m_ObjectHideFlags: 0

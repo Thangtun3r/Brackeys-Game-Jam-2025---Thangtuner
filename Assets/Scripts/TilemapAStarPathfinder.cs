@@ -6,21 +6,20 @@ using UnityEngine.Tilemaps;
 public class TilemapAStarPathfinder : MonoBehaviour
 {
     [Header("Tilemap & Tile Settings")]
-    public Tilemap overlayTilemap;   // Tilemap where the player paints the path.
-    public Tile pathTile;            // Tile used for painting the path.
+    public Tilemap overlayTilemap;
+    public Tile pathTile;
 
     [Header("Allowed Area")]
-    public Tilemap allowedAreaTilemap; // Defines the placeable area (cells with a tile here are allowed).
+    public Tilemap allowedAreaTilemap;
 
     [Header("Path Requirements")]
-    public int requiredPathLength = 5; // Required number of painted tiles.
+    public int requiredPathLength = 5;
 
     [Header("Spawner Reference")]
-    public EnemySpawner enemySpawner; // Reference to Enemy Spawner.
+    public EnemySpawner enemySpawner;
 
-    // List to record all painted cells.
     private List<Vector3Int> paintedCells = new List<Vector3Int>();
-    public event Action OnPathValidated; // Event to notify readiness
+    public event Action OnPathValidated;
     public static bool pathValid = false;
     public static bool placeAble = false;
 
@@ -34,47 +33,34 @@ public class TilemapAStarPathfinder : MonoBehaviour
     {
         if (placeAble)
         {
-            // Left mouse button: paint while held.
             if (Input.GetMouseButton(0))
             {
-                // Enforce maximum paint length.
                 if (paintedCells.Count >= requiredPathLength)
-                {
-                    Debug.Log("Cannot paint: required path length reached.");
                     return;
-                }
+
                 Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 Vector3Int cellPos = overlayTilemap.WorldToCell(worldPos);
 
-                // Check: within allowed area, not already painted, and not occupied by a turret.
                 if (IsWithinAllowedArea(cellPos) && !IsCellPainted(cellPos) && !IsCellOccupiedByTurret(cellPos))
                 {
-                    // Temporarily add the tile for checking.
                     paintedCells.Add(cellPos);
                     overlayTilemap.SetTile(cellPos, pathTile);
 
-                    // Check if this move created a 2x2 block.
                     if (Has2x2Block(paintedCells))
                     {
-                        // Undo the placement and notify the player.
                         overlayTilemap.SetTile(cellPos, null);
                         paintedCells.Remove(cellPos);
-                        Debug.Log("Cannot paint: placing this tile creates a 2x2 block.");
                         return;
                     }
 
-                    // Check if this move creates an intersection.
                     if (HasIntersection(paintedCells))
                     {
-                        // Undo the placement and notify the player.
                         overlayTilemap.SetTile(cellPos, null);
                         paintedCells.Remove(cellPos);
-                        Debug.Log("Cannot paint: placing this tile would create an intersection.");
                     }
                 }
             }
 
-            // Right mouse button: erase while held.
             if (Input.GetMouseButton(1))
             {
                 Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -88,14 +74,9 @@ public class TilemapAStarPathfinder : MonoBehaviour
         }
     }
 
-    // New helper method: checks if a cell is occupied by a turret.
     bool IsCellOccupiedByTurret(Vector3Int cellPos)
     {
-        if (TurretPlacementManager.Instance != null)
-        {
-            return TurretPlacementManager.Instance.IsCellOccupied(cellPos);
-        }
-        return false;
+        return TurretPlacementManager.Instance != null && TurretPlacementManager.Instance.IsCellOccupied(cellPos);
     }
 
     bool IsWithinAllowedArea(Vector3Int cellPos)
@@ -118,18 +99,17 @@ public class TilemapAStarPathfinder : MonoBehaviour
 
         foreach (Vector3Int cell in cells)
         {
-            int neighborCount = GetNeighborCount(cell, cellSet);
-            if (neighborCount == 1)
+            if (GetNeighborCount(cell, cellSet) == 1)
             {
                 start = cell;
                 break;
             }
         }
 
-        List<Vector3Int> ordered = new List<Vector3Int>();
-        ordered.Add(start);
+        List<Vector3Int> ordered = new List<Vector3Int> { start };
         cellSet.Remove(start);
         Vector3Int current = start;
+
         while (cellSet.Count > 0)
         {
             bool foundNext = false;
@@ -166,10 +146,7 @@ public class TilemapAStarPathfinder : MonoBehaviour
         HashSet<Vector3Int> set = new HashSet<Vector3Int>(cells);
         foreach (Vector3Int cell in cells)
         {
-            Vector3Int right = cell + Vector3Int.right;
-            Vector3Int up = cell + Vector3Int.up;
-            Vector3Int upRight = cell + new Vector3Int(1, 1, 0);
-            if (set.Contains(right) && set.Contains(up) && set.Contains(upRight))
+            if (set.Contains(cell + Vector3Int.right) && set.Contains(cell + Vector3Int.up) && set.Contains(cell + new Vector3Int(1, 1, 0)))
                 return true;
         }
         return false;
@@ -180,8 +157,7 @@ public class TilemapAStarPathfinder : MonoBehaviour
         HashSet<Vector3Int> set = new HashSet<Vector3Int>(cells);
         foreach (Vector3Int cell in cells)
         {
-            int neighborCount = GetNeighborCount(cell, set);
-            if (neighborCount > 2)
+            if (GetNeighborCount(cell, set) > 2)
                 return true;
         }
         return false;
@@ -189,33 +165,14 @@ public class TilemapAStarPathfinder : MonoBehaviour
 
     void ValidateAndStartPath()
     {
-        List<string> errors = new List<string>();
-
-        if (paintedCells.Count != requiredPathLength)
-            errors.Add($"Path length is {paintedCells.Count}, but required is {requiredPathLength}.");
-
-        List<Vector3Int> orderedPath = OrderPaintedCells(paintedCells);
-
-        if (Has2x2Block(orderedPath))
-            errors.Add("The painted path contains a 2x2 block. Fix this before continuing.");
-
-        if (HasIntersection(orderedPath))
-            errors.Add("The painted path crosses itself, which is not allowed.");
-
-        if (errors.Count > 0)
+        if (paintedCells.Count != requiredPathLength || Has2x2Block(paintedCells) || HasIntersection(paintedCells))
         {
-            foreach (string err in errors)
-            {
-                Debug.Log("Invalid placing: " + err);
-            }
             pathValid = false;
         }
         else
         {
-            Debug.Log("path valid");
             pathValid = true;
-            enemySpawner.SetPath(orderedPath);
-            //OnPathValidated?.Invoke();
+            enemySpawner.SetPath(OrderPaintedCells(paintedCells));
         }
     }
 }

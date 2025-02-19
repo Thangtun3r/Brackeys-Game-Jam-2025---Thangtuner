@@ -41,6 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6806366788463059044}
   - component: {fileID: 8415749475585573383}
+  - component: {fileID: 7383432069342908086}
   m_Layer: 0
   m_Name: Laser Turret
   m_TagString: Untagged
@@ -116,6 +117,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &7383432069342908086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5862858502445271555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4b541140f101274ba76507adbd4541c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  normalRefundCost: 20
+  nonRefundableRefundCost: 10
+  isRefundable: 1
 --- !u!1 &7276902945397109015
 GameObject:
   m_ObjectHideFlags: 0
@@ -214,6 +230,7 @@ GameObject:
   - component: {fileID: 8118492511073565543}
   - component: {fileID: 5911930713478578366}
   - component: {fileID: 7127146019060247287}
+  - component: {fileID: 7894191214163034704}
   m_Layer: 0
   m_Name: Base
   m_TagString: Untagged
@@ -456,3 +473,18 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &7894191214163034704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8749058823889207395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4b541140f101274ba76507adbd4541c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  normalRefundCost: 10
+  nonRefundableRefundCost: 5
+  isRefundable: 1

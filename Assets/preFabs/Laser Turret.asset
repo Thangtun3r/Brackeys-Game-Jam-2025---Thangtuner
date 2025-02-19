@@ -10,10 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aaf2ea1bf074ee541b61a577546ab9b3, type: 3}
-  m_Name: Rocket Turret
+  m_Name: Laser Turret
   m_EditorClassIdentifier: 
   turretPrefab: {fileID: 5862858502445271555, guid: a5e09895b4ed90f4b93adea1e9c6089d, type: 3}
   previewSprite: {fileID: 0}
-  cost: 30
+  originalCost: 20
+  partialRefundCost: 10
+  cost: 20
   range: 0
   fireRate: 0
+  isRefundable: 1

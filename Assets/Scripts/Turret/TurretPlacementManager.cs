@@ -80,21 +80,32 @@ public class TurretPlacementManager : MonoBehaviour
         
 
         // Right-click to remove (bulldoze) a turret and refund its cost
-        if(BulldozeMode.bulldozeMode == true)
+        if (BulldozeMode.bulldozeMode == true)
         {
             Destroy(currentPreview);
             currentPreview = null;
-            if (Input.GetMouseButtonDown(0)) {
+            if (Input.GetMouseButtonDown(0))
+            {
                 Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 Vector3Int gridPos = allowedTilemap.WorldToCell(mouseWorldPos);
-                if (placedTurrets.ContainsKey(gridPos)) {
+                if (placedTurrets.ContainsKey(gridPos))
+                {
                     GameObject turretToRemove = placedTurrets[gridPos];
-                    Turret turretComponent = turretToRemove.GetComponent<Turret>();
-                    if (turretComponent != null && turretComponent.turretData != null) {
-                        ResourceManager.Instance.AddCoins(turretComponent.turretData.cost);
-                        Debug.Log($"Refunded {turretComponent.turretData.cost} coins.");
+                    // Get the refund data from the separate TurretBase component.
+                    TurretBase refundComponent = turretToRemove.GetComponent<TurretBase>();
+                    if (refundComponent != null)
+                    {
+                        int refundAmount = refundComponent.isRefundable 
+                            ? refundComponent.normalRefundCost 
+                            : refundComponent.nonRefundableRefundCost;
+                        ResourceManager.Instance.AddCoins(refundAmount);
+                        Debug.Log("Refunded " + refundAmount + " coins from turret: " + turretToRemove.name);
                     }
-                    // Remove the turret from all occupied cells
+                    else
+                    {
+                        Debug.LogWarning("No TurretBase component found on turret: " + turretToRemove.name);
+                    }
+                    // Remove the turret from all occupied cells.
                     List<Vector3Int> keysToRemove = new List<Vector3Int>();
                     foreach (var kvp in placedTurrets)
                     {
@@ -108,6 +119,8 @@ public class TurretPlacementManager : MonoBehaviour
                 }
             }
         }
+
+
         
         
     }
@@ -150,11 +163,6 @@ public class TurretPlacementManager : MonoBehaviour
         // Instantiate the turret at the center of the 2x2 area
         GameObject newTurret = Instantiate(selectedTurretData.turretPrefab, placementCenter, Quaternion.identity);
         
-        // Optionally, assign turretData to the turret component
-        Turret turretComponent = newTurret.GetComponent<Turret>();
-        if(turretComponent != null) {
-            turretComponent.turretData = selectedTurretData;
-        }
 
         // Mark all cells occupied by the 2x2 turret as taken
         Vector3Int[] occupiedCells = new Vector3Int[4] {

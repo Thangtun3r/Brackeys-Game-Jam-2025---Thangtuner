@@ -8,6 +8,8 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     public float maxHealth = 100;
     private float currentHealth;
 
+    [Header("Enemy AI Settings")] public int coinValue = 1;
+
     private EnemyAIPathFollower aiPathFollower;
     private int poolIndex;
     private bool isPartOfWave = false; // Mark if this enemy belongs to the current wave
@@ -37,8 +39,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
     private void Die()
     {
-        Debug.Log($"{gameObject.name} has been destroyed!");
-        // Only count removal once.
+        ResourceManager.Instance.AddCoins(coinValue);
         if (!hasBeenCounted)
         {
             hasBeenCounted = true;
