@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Turret : MonoBehaviour, IDamageable
 {
-    
-
     [Header("Turret Settings")]
     public float health = 100;
     public GameObject rewardPrefab;
@@ -24,6 +22,7 @@ public class Turret : MonoBehaviour, IDamageable
 
     [Header("Rotation Settings")]
     public float rotationSpeed = 5f; // How fast the turret rotates
+    public float rotationThreshold = 5f; // Angle (in degrees) within which the turret is considered "aimed" at the target
 
     private List<GameObject> bulletPool;
     private float nextFireTime;
@@ -43,22 +42,33 @@ public class Turret : MonoBehaviour, IDamageable
         FindTarget();
         if (target != null)
         {
-            SmoothAimAtTarget(); // Now uses Lerp for smooth rotation
-            if (Time.time >= nextFireTime && currentBullets > 0)
-            {
-                Shoot();
-                nextFireTime = Time.time + 1f / fireRate;
-                currentBullets--;
+            // Rotate turret smoothly toward the target.
+            SmoothAimAtTarget();
 
-                if (currentBullets <= 0)
+            // Check if turret is aimed at the target within the rotation threshold.
+            float currentAngle = transform.eulerAngles.z;
+            Vector2 direction = target.position - transform.position;
+            float desiredAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            float angleDifference = Mathf.Abs(Mathf.DeltaAngle(currentAngle, desiredAngle));
+
+            if (angleDifference <= rotationThreshold)
+            {
+                if (Time.time >= nextFireTime && currentBullets > 0)
                 {
-                    StartCoroutine(Reload());
+                    Shoot();
+                    nextFireTime = Time.time + 1f / fireRate;
+                    currentBullets--;
+
+                    if (currentBullets <= 0)
+                    {
+                        StartCoroutine(Reload());
+                    }
                 }
             }
         }
     }
 
-    // Implementing IDamageable
+    // IDamageable implementation.
     public void TakeDamage(float damage)
     {
         health -= damage;
@@ -70,7 +80,6 @@ public class Turret : MonoBehaviour, IDamageable
 
     void Die()
     {
-        
         if (rewardPrefab != null)
         {
             Instantiate(rewardPrefab, transform.position, Quaternion.identity);
@@ -115,9 +124,10 @@ public class Turret : MonoBehaviour, IDamageable
         if (bullet != null)
         {
             bullet.transform.position = firePoint.position;
+            // Set bullet rotation to the firePoint's rotation so it travels straight.
             bullet.transform.rotation = firePoint.rotation;
             bullet.SetActive(true);
-            bullet.GetComponent<TurretBullet>().SetTarget(target);
+            // Note: Removed the SetTarget call to ensure the bullet travels in a straight line.
         }
     }
 
