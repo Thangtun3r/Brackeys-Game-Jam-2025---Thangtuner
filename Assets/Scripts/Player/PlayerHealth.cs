@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerHealth : MonoBehaviour, IDamageable
+public class PlayerHealth : MonoBehaviour, IDamageable,IHealable
 {
     [Header("Health Settings")]
     public float maxHealth = 100f;
@@ -12,6 +12,15 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     void Start()
     {
         currentHealth = maxHealth;
+    }
+    public void Heal(float healAmount)
+    {
+        currentHealth += healAmount;
+        if (currentHealth > maxHealth)
+        {
+            currentHealth = maxHealth;
+        }
+        OnHealthChanged?.Invoke(currentHealth);
     }
 
     public void TakeDamage(float damage)

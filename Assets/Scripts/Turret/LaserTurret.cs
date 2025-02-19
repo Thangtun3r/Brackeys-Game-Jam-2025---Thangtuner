@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class LaserBeamAuto : MonoBehaviour
+public class LaserBeamAuto : MonoBehaviour, IDamageable
 {
     [Header("External References")]
     public Transform shootingPoint;
@@ -28,6 +28,11 @@ public class LaserBeamAuto : MonoBehaviour
     [Header("Laser Width Settings")]
     public float baseLineWidth = 0.05f;
     public float widthPerMultiplier = 0.02f;
+
+    [Header("Health Settings")]
+    public float health = 100f;
+    // Assign your reward prefab in the Inspector.
+    public GameObject rewardPrefab;
 
     private Transform currentTarget = null;
     private float currentMultiplier = 1f;
@@ -221,5 +226,25 @@ public class LaserBeamAuto : MonoBehaviour
         currentMultiplier = 1f;
         multiplierTimer = 0f;
         damageTimer = 0f;
+    }
+
+    // IDamageable implementation
+    public void TakeDamage(float damage)
+    {
+        health -= damage;
+        if (health <= 0f)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        
+        if (rewardPrefab != null)
+        {
+            Instantiate(rewardPrefab, transform.position, Quaternion.identity);
+        }
+        gameObject.SetActive(false); // Simulate destruction.
     }
 }

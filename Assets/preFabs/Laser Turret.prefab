@@ -334,6 +334,8 @@ MonoBehaviour:
   overheatingCooldownPenalty: 3
   baseLineWidth: 0.05
   widthPerMultiplier: 0.02
+  health: 10
+  rewardPrefab: {fileID: 4156062537451901868, guid: 20f92af19278db24a94ddde6245a4cd4, type: 3}
 --- !u!120 &5911930713478578366
 LineRenderer:
   serializedVersion: 2

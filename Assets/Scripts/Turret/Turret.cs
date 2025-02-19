@@ -8,6 +8,7 @@ public class Turret : MonoBehaviour, IDamageable
 
     [Header("Turret Settings")]
     public float health = 100;
+    public GameObject rewardPrefab;
     public float fireRate = 1f;
     public float detectionRange = 10f;
     public Transform firePoint;
@@ -67,10 +68,14 @@ public class Turret : MonoBehaviour, IDamageable
         }
     }
 
-    private void Die()
+    void Die()
     {
-        Debug.Log(gameObject.name + " destroyed!");
-        gameObject.SetActive(false); // Simulate destruction
+        
+        if (rewardPrefab != null)
+        {
+            Instantiate(rewardPrefab, transform.position, Quaternion.identity);
+        }
+        gameObject.SetActive(false); // Simulate destruction.
     }
 
     private void FindTarget()
