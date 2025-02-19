@@ -1,41 +1,69 @@
 using System.Collections;
 using UnityEngine;
 
-public class LaserBeam : MonoBehaviour
+public class LaserBeamAuto : MonoBehaviour
 {
-    public Transform shootingPoint; // Assign in Inspector
-    public LineRenderer lineRenderer; // Assign in Inspector
+    [Header("External References")]
+    public Transform shootingPoint;
+    public LineRenderer lineRenderer;
+
+    [Header("Damage / Multiplier")]
     public float baseDamage = 5f;
     public float multiplierIncrement = 0.2f;
     public float timeToIncreaseMultiplier = 3f;
     public float maxMultiplier = 2f;
-    public float maxDistance = 50f;
     public float damageInterval = 1f;
+    public float maxDistance = 50f;
+
+    [Header("Rotation Settings")]
     public float rotationSpeed = 5f;
 
     [Header("Overheat System")]
-    public float maxOverheat = 10f; // Maximum overheat threshold
-    public float overheatIncrease = 1f; // Overheat increases per second
-    public float normalCoolingRate = 1f; // Cooling rate when not overheated
-    public float overheatedCooldownTime = 5f; // Cooldown time if overheated
-    public float overheatingCooldownPenalty = 3f; // Additional cooldown penalty when overheated
+    public float maxOverheat = 10f;
+    public float overheatIncrease = 1f;
+    public float normalCoolingRate = 1f;
+    public float overheatedCooldownTime = 5f;
+    public float overheatingCooldownPenalty = 3f;
 
+    [Header("Laser Width Settings")]
+    public float baseLineWidth = 0.05f;
+    public float widthPerMultiplier = 0.02f;
+
+    private Transform currentTarget = null;
     private float currentMultiplier = 1f;
     private float damageTimer = 0f;
     private float multiplierTimer = 0f;
-    private IDamageable lastTarget;
-    private Transform currentTarget;
     private float overheatMeter = 0f;
     private bool isOverheated = false;
     private bool isFiring = false;
+
+    void Start()
+    {
+        // Optional global setting: Now raycasts won't hit 2D triggers at all
+        Physics2D.queriesHitTriggers = false; 
+
+        if (lineRenderer)
+        {
+            lineRenderer.enabled = false;
+            // Force the line in front of your sprites:
+            // Use an actual Sorting Layer name from your project:
+            lineRenderer.sortingLayerName = "Foreground"; 
+            lineRenderer.sortingOrder = 10;
+        }
+    }
 
     void Update()
     {
         FindAndTrackTarget();
 
-        if (!isOverheated)
+        // If we have a valid target and are NOT overheated, we fire
+        if (!isOverheated && currentTarget != null)
         {
-            FireLaser();
+            StartFiring();
+        }
+        else
+        {
+            StopFiring();
         }
 
         HandleOverheat();
@@ -43,20 +71,34 @@ public class LaserBeam : MonoBehaviour
 
     void FindAndTrackTarget()
     {
+        bool lostTarget = false;
         if (currentTarget == null || !currentTarget.gameObject.activeInHierarchy)
         {
-            ResetTarget();
+            lostTarget = true;
+        }
+        else
+        {
+            float dist = Vector2.Distance(transform.position, currentTarget.position);
+            if (dist > maxDistance)
+                lostTarget = true;
+        }
+
+        if (lostTarget)
+        {
+            currentTarget = null;
             GameObject[] targets = GameObject.FindGameObjectsWithTag("Damageable");
             float shortestDistance = Mathf.Infinity;
             GameObject nearestTarget = null;
 
-            foreach (GameObject target in targets)
+            foreach (GameObject t in targets)
             {
-                float distance = Vector2.Distance(transform.position, target.transform.position);
-                if (distance < shortestDistance)
+                if (!t.activeInHierarchy) continue;
+
+                float distance = Vector2.Distance(transform.position, t.transform.position);
+                if (distance < shortestDistance && distance <= maxDistance)
                 {
                     shortestDistance = distance;
-                    nearestTarget = target;
+                    nearestTarget = t;
                 }
             }
 
@@ -75,31 +117,53 @@ public class LaserBeam : MonoBehaviour
         }
     }
 
-    void FireLaser()
+    void StartFiring()
     {
-        lineRenderer.enabled = true;
-        lineRenderer.SetPosition(0, shootingPoint.position);
-        isFiring = true;
+        if (!isFiring)
+        {
+            isFiring = true;
+            if (lineRenderer) lineRenderer.enabled = true;
+        }
 
+        FireLaserBeam();
+        UpdateDamageMultiplier();
+    }
+
+    void StopFiring()
+    {
+        if (isFiring)
+        {
+            isFiring = false;
+            if (lineRenderer) lineRenderer.enabled = false;
+            ResetMultiplier();
+        }
+    }
+
+    void FireLaserBeam()
+    {
+        if (!lineRenderer) return;
+
+        // Adjust the width based on multiplier
+        float width = baseLineWidth + (currentMultiplier - 1f) * widthPerMultiplier;
+        width = Mathf.Max(0f, width);
+        lineRenderer.startWidth = width;
+        lineRenderer.endWidth = width;
+
+        lineRenderer.SetPosition(0, shootingPoint.position);
+
+        // Raycast (ignoring triggers thanks to queriesHitTriggers=false)
         RaycastHit2D hit = Physics2D.Raycast(shootingPoint.position, shootingPoint.right, maxDistance);
         if (hit.collider != null)
         {
             lineRenderer.SetPosition(1, hit.point);
-            IDamageable damageable = hit.collider.GetComponent<IDamageable>();
-
-            if (damageable != null)
+            IDamageable dmg = hit.collider.GetComponent<IDamageable>();
+            if (dmg != null)
             {
-                if (damageable != lastTarget)
-                {
-                    lastTarget = damageable; // New target assigned, but multiplier does NOT reset
-                }
-
-                // Damage interval check
                 damageTimer += Time.deltaTime;
                 if (damageTimer >= damageInterval)
                 {
                     float totalDamage = baseDamage * currentMultiplier;
-                    damageable.TakeDamage(totalDamage);
+                    dmg.TakeDamage(totalDamage);
                     damageTimer = 0f;
                 }
             }
@@ -108,8 +172,10 @@ public class LaserBeam : MonoBehaviour
         {
             lineRenderer.SetPosition(1, shootingPoint.position + shootingPoint.right * maxDistance);
         }
+    }
 
-        // Multiplier continues even if no hit, only stops if overheated or disabled
+    void UpdateDamageMultiplier()
+    {
         multiplierTimer += Time.deltaTime;
         if (multiplierTimer >= timeToIncreaseMultiplier)
         {
@@ -124,7 +190,6 @@ public class LaserBeam : MonoBehaviour
         if (isFiring)
         {
             overheatMeter += overheatIncrease * Time.deltaTime;
-
             if (overheatMeter >= maxOverheat)
             {
                 StartCoroutine(OverheatCooldown());
@@ -133,25 +198,22 @@ public class LaserBeam : MonoBehaviour
         else
         {
             overheatMeter -= normalCoolingRate * Time.deltaTime;
-            overheatMeter = Mathf.Max(overheatMeter, 0);
+            overheatMeter = Mathf.Max(overheatMeter, 0f);
         }
     }
 
     IEnumerator OverheatCooldown()
     {
         isOverheated = true;
-        lineRenderer.enabled = false;
+        if (lineRenderer) lineRenderer.enabled = false;
         isFiring = false;
-        yield return new WaitForSeconds(overheatedCooldownTime + (overheatMeter > maxOverheat ? overheatingCooldownPenalty : 0));
-        isOverheated = false;
-        overheatMeter = 0;
         ResetMultiplier();
-    }
 
-    void ResetTarget()
-    {
-        currentTarget = null;
-        transform.rotation = Quaternion.identity;
+        float penaltyTime = (overheatMeter > maxOverheat) ? overheatingCooldownPenalty : 0f;
+        yield return new WaitForSeconds(overheatedCooldownTime + penaltyTime);
+
+        isOverheated = false;
+        overheatMeter = 0f;
     }
 
     void ResetMultiplier()
@@ -159,6 +221,5 @@ public class LaserBeam : MonoBehaviour
         currentMultiplier = 1f;
         multiplierTimer = 0f;
         damageTimer = 0f;
-        lastTarget = null;
     }
 }
