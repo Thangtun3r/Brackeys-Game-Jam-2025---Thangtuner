@@ -1,42 +1,54 @@
+using System.Collections;
 using UnityEngine;
 
 public class SwapManager : MonoBehaviour
 {
+    public float swapDelay;
     void OnEnable()
     {
-        // ✅ Subscribe to Phase One and Wave End events
+        // Subscribe to events
         WaveManager.OnPhaseOneComplete += EnableChildren;
         WaveManager.OnWaveEnd += DisableChildren;
     }
 
     void OnDisable()
     {
-        // ✅ Unsubscribe to prevent memory leaks
+        // Unsubscribe from events to prevent memory leaks
         WaveManager.OnPhaseOneComplete -= EnableChildren;
         WaveManager.OnWaveEnd -= DisableChildren;
     }
 
     /// <summary>
-    /// Enables all child objects when Phase One ends.
+    /// Begins the coroutine to enable all child objects after a delay.
     /// </summary>
     private void EnableChildren()
     {
-        Debug.Log("Phase One ended. Enabling all children.");
+        Debug.Log("Phase One ended. Enabling all children after a delay.");
+        StartCoroutine(EnableChildrenAfterDelay());
+    }
+
+    /// <summary>
+    /// Coroutine that waits for the specified delay before enabling children.
+    /// </summary>
+    private IEnumerator EnableChildrenAfterDelay()
+    {
+        yield return new WaitForSeconds(swapDelay);
         foreach (Transform child in transform)
         {
-            child.gameObject.SetActive(true); // ✅ Enable each child object
+            child.gameObject.SetActive(true);
         }
     }
 
     /// <summary>
-    /// Disables all child objects when the Wave ends.
+    /// Immediately disables all child objects.
     /// </summary>
     private void DisableChildren()
     {
         Debug.Log("Wave ended. Disabling all children.");
         foreach (Transform child in transform)
         {
-            child.gameObject.SetActive(false); // ✅ Disable each child object
+            child.gameObject.SetActive(false);
         }
     }
+
 }

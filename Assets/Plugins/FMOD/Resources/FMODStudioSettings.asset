@@ -536,7 +536,8 @@ MonoBehaviour:
   switchSettingsMigration: 1
   HasSourceProject: 0
   HasPlatforms: 0
-  sourceProjectPath: 
+  sourceProjectPath: ../../Softwares/FMOD/You are what you made of/You are what you
+    made of.fspro
   sourceBankPath: FMOD Bank/Desktop
   sourceBankPathUnformatted: 
   BankRefreshCooldown: 5
@@ -560,7 +561,10 @@ MonoBehaviour:
   Plugins: []
   MasterBanks:
   - Desktop/Master
-  Banks: []
+  - Desktop/Master
+  Banks:
+  - Desktop/Bank A
+  - Desktop/Bank A
   BanksToLoad: []
   LiveUpdatePort: 9264
   EnableMemoryTracking: 0
@@ -573,7 +577,7 @@ MonoBehaviour:
   SharedLibraryUpdateStage: 0
   SharedLibraryTimeSinceStart: 0
   CurrentVersion: 131622
-  HideSetupWizard: 0
+  HideSetupWizard: 1
   LastEventReferenceScanVersion: 131622
   Platforms:
   - {fileID: -2699868993299321846}
