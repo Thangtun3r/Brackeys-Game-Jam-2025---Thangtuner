@@ -6,7 +6,7 @@ using UnityEngine;
 public class BulldozeMode : MonoBehaviour
 {
     public static bool bulldozeMode = false;
-    public GameObject bullDozSprite;
+    public Animator bullDozAnimator; // Reference to the Animator
     public GameObject turretButtons;
 
     private void Update()
@@ -20,10 +20,15 @@ public class BulldozeMode : MonoBehaviour
         {
             bulldozeMode = !bulldozeMode;
 
-            // Toggle the active state of the target object
-            if (bullDozSprite != null)
+            // Toggle animator's isBulldoze parameter instead of setting active/inactive
+            if (bullDozAnimator != null)
             {
-                bullDozSprite.SetActive(!bullDozSprite.activeSelf);
+                bullDozAnimator.SetBool("isBulldoze", bulldozeMode);
+            }
+
+            // Toggle turret buttons visibility
+            if (turretButtons != null)
+            {
                 turretButtons.SetActive(!turretButtons.activeSelf);
             }
         }
