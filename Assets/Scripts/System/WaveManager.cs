@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class WaveManager : MonoBehaviour
 {
@@ -26,7 +27,8 @@ public class WaveManager : MonoBehaviour
     private bool phaseTwoActive = false;
     private int timeLeft; // Time left in Phase 2
 
-    [Header("References")]
+    [Header("References")] 
+    public string winningScreen = "WinningScreen";
     public EnemySpawner enemySpawner;
     public TMP_Text waveNumberText; // Displays wave number
     public TMP_Text enemyCountText;  // Displays Minions & Tanks count
@@ -117,13 +119,17 @@ public class WaveManager : MonoBehaviour
     /// </summary>
     public void OnWavePhaseOneComplete()
     {
-        if (phaseTwoActive) return;
-
-        Debug.Log($"Phase 1 complete for Wave {currentWaveIndex + 1}. Phase 2 starts in {waves[currentWaveIndex].phaseTwoDelay} seconds.");
+        // Only check phaseTwoActive if it’s not the final wave.
+        if (currentWaveIndex + 1 < waves.Length && phaseTwoActive)
+            return;
+        
+        Debug.LogError($"[WaveManager] OnWavePhaseOneComplete triggered! " +
+                       $"Current Wave Index: {currentWaveIndex}, " +
+                       $"PhaseTwoActive: {phaseTwoActive}");
         OnPhaseOneComplete?.Invoke();
-
         StartCoroutine(StartPhaseTwo(waves[currentWaveIndex].phaseTwoDelay, waves[currentWaveIndex].phaseTwoDuration));
     }
+
 
     /// <summary>
     /// Starts Phase 2 after a delay and runs a countdown.
@@ -171,7 +177,6 @@ public class WaveManager : MonoBehaviour
         Debug.Log($"Wave {currentWaveIndex + 1} ended.");
         phaseTwoActive = false;
         waveReady = true;
-
         OnWaveEnd?.Invoke();
 
         if (currentWaveIndex + 1 < waves.Length)
@@ -183,6 +188,8 @@ public class WaveManager : MonoBehaviour
         else
         {
             Debug.Log("All waves completed! No more waves left.");
+            // Only when the entire final wave (phase two) has ended do we load the winning scene.
+            SceneManager.LoadScene(winningScreen);
         }
     }
 
@@ -209,4 +216,5 @@ public class WaveManager : MonoBehaviour
         if (waveErrorAnimator != null)
             waveErrorAnimator.SetBool("isError", false);
     }
+    
 }

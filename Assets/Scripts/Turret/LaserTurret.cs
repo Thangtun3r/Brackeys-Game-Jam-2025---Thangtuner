@@ -8,7 +8,8 @@ public class LaserBeamAuto : MonoBehaviour, IDamageable
     public Transform shootingPoint;
     public LineRenderer lineRenderer;
     public ParticleSystem deadParticle;
-    public GameObject healthUI; 
+    public GameObject healthUI;
+    public GameObject overHeatIndicator;
 
     [Header("Damage / Multiplier")]
     public float baseDamage = 5f;
@@ -32,7 +33,8 @@ public class LaserBeamAuto : MonoBehaviour, IDamageable
     public float baseLineWidth = 0.05f;
     public float widthPerMultiplier = 0.02f;
 
-    [Header("Health Settings")]
+    [Header("Health Settings")] 
+    public float maxHealth;
     public float health = 100f;
     public GameObject rewardPrefab;
 
@@ -58,6 +60,11 @@ public class LaserBeamAuto : MonoBehaviour, IDamageable
             lineRenderer.enabled = false;
             lineRenderer.sortingLayerName = "Foreground"; 
             lineRenderer.sortingOrder = 10;
+        }
+
+        if (overHeatIndicator != null)
+        {
+            overHeatIndicator.SetActive(false);
         }
 
         UpdateHealthUI();
@@ -165,7 +172,9 @@ public class LaserBeamAuto : MonoBehaviour, IDamageable
         lineRenderer.endWidth = width;
 
         lineRenderer.SetPosition(0, shootingPoint.position);
+        
 
+// Perform the raycast with the layer mask.
         RaycastHit2D hit = Physics2D.Raycast(shootingPoint.position, shootingPoint.right, maxDistance);
         if (hit.collider != null)
         {
@@ -222,12 +231,18 @@ public class LaserBeamAuto : MonoBehaviour, IDamageable
         if (lineRenderer) lineRenderer.enabled = false;
         isFiring = false;
         ResetMultiplier();
+        if (overHeatIndicator != null)
+        {
+            overHeatIndicator.SetActive(true);
+        }
 
         float penaltyTime = (overheatMeter > maxOverheat) ? overheatingCooldownPenalty : 0f;
         yield return new WaitForSeconds(overheatedCooldownTime + penaltyTime);
 
         isOverheated = false;
         overheatMeter = 0f;
+        
+        overHeatIndicator.SetActive(false);
     }
 
     void ResetMultiplier()
@@ -264,7 +279,7 @@ public class LaserBeamAuto : MonoBehaviour, IDamageable
     {
         if (healthBar != null)
         {
-            healthBar.fillAmount = health / 100f;
+            healthBar.fillAmount = health / maxHealth;
         }
     }
 }

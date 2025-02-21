@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 19
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -116,7 +116,7 @@ TextureImporter:
         x: 0
         y: 0
         width: 32
-        height: 32
+        height: 44
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -137,7 +137,7 @@ TextureImporter:
         x: 32
         y: 0
         width: 32
-        height: 32
+        height: 44
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -145,8 +145,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 019ace79c19d2114087c1a4d29720f8c
-      internalID: -1133299778
+      spriteID: 3d9bc94d152cd0b4e8eb3028ebc32134
+      internalID: 662390430
       vertices: []
       indices: 
       edges: []
@@ -158,7 +158,7 @@ TextureImporter:
         x: 64
         y: 0
         width: 32
-        height: 32
+        height: 44
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,8 +166,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: da8e2f7dfe3a906419500993cbd3360e
-      internalID: -792904241
+      spriteID: 90fdd0200174775469ba4e1bb110cc78
+      internalID: -1189737008
       vertices: []
       indices: 
       edges: []
@@ -179,7 +179,7 @@ TextureImporter:
         x: 96
         y: 0
         width: 32
-        height: 32
+        height: 44
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -187,8 +187,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7a86cf4ba049e0e4c81b6ac5887aecc9
-      internalID: -110335371
+      spriteID: 87453458c93571f46aeb6b644d96325c
+      internalID: 329851710
       vertices: []
       indices: 
       edges: []
@@ -205,9 +205,9 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       TankEnemySprite_0: -848552971
-      TankEnemySprite_1: -1133299778
-      TankEnemySprite_2: -792904241
-      TankEnemySprite_3: -110335371
+      TankEnemySprite_1: 662390430
+      TankEnemySprite_2: -1189737008
+      TankEnemySprite_3: 329851710
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

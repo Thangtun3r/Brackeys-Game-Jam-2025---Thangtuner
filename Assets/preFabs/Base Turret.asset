@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turretPrefab: {fileID: 5862858502445271555, guid: d390ef16605deea4e803bbe800962b00, type: 3}
   previewSprite: {fileID: 0}
-  originalCost: 10
+  originalCost: 15
   partialRefundCost: 5
-  cost: 10
+  cost: 15
   range: 0
   fireRate: 0
   isRefundable: 1

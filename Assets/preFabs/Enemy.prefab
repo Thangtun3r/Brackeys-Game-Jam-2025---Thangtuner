@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2486566231755048789}
   - component: {fileID: 2866925850246362878}
   - component: {fileID: 4005894740704010946}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: Health UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -114,7 +114,7 @@ GameObject:
   - component: {fileID: 1125590891613521776}
   - component: {fileID: 3899495216596550674}
   - component: {fileID: 5531358283097176674}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -189,7 +189,7 @@ GameObject:
   - component: {fileID: 3956287179698784599}
   - component: {fileID: 4932532602198856400}
   - component: {fileID: 1658530928440316113}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: Bacjkground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -332,7 +332,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 13
+  m_SortingOrder: 14
   m_Sprite: {fileID: 809533321, guid: 38c6a2e4fe9910247bdf2de939a36f28, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -358,7 +358,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hasBeenCounted: 0
   baseTilemap: {fileID: 0}
-  moveSpeed: 2
+  moveSpeed: 1.5
 --- !u!114 &3207781426441781399
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -372,8 +372,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hasBeenCounted: 0
-  maxHealth: 100
-  coinValue: 1
+  maxHealth: 10
+  coinValue: 2
   healthBar: {fileID: 5531358283097176674}
 --- !u!58 &-4610417322911943540
 CircleCollider2D:

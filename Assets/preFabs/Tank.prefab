@@ -182,7 +182,7 @@ Transform:
   m_GameObject: {fileID: 7873391419685451219}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.44, z: 0}
   m_LocalScale: {x: 0.7047, y: 0.7047, z: 0.7047}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -235,7 +235,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.6842105, y: 2.3157895}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -255,7 +255,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hasBeenCounted: 0
   baseTilemap: {fileID: 0}
-  moveSpeed: 2
+  moveSpeed: 0.5
 --- !u!114 &3207781426441781399
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -269,8 +269,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hasBeenCounted: 0
-  maxHealth: 100
-  coinValue: 1
+  maxHealth: 400
+  coinValue: 2
   healthBar: {fileID: 1763068874728604185}
 --- !u!58 &-4610417322911943540
 CircleCollider2D:
@@ -319,7 +319,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fe89f2c2e92dee4994c0b5c4b8ae2c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 10
+  damage: 40
 --- !u!50 &-7278346451941984328
 Rigidbody2D:
   serializedVersion: 4
@@ -396,7 +396,7 @@ RectTransform:
   m_GameObject: {fileID: 8415478986720646967}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.040130552, y: 0.040130552, z: 0.040130552}
+  m_LocalScale: {x: 0.058574554, y: 0.058574554, z: 0.058574554}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5661621181913974454}
@@ -405,7 +405,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.028318588, y: 0.97581124}
+  m_AnchoredPosition: {x: -0.028318588, y: 1.47}
   m_SizeDelta: {x: 2560, y: 1440}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &7016758875071724593

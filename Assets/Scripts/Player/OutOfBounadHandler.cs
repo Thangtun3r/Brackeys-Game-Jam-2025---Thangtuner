@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class OutOfBoundsHandler : MonoBehaviour
 {
@@ -8,6 +9,10 @@ public class OutOfBoundsHandler : MonoBehaviour
     public float healthDrainInterval = 1f; // Time between each health loss
     public int healthDrainAmount = 1; // Health lost per interval
 
+    [Header("UI Warning")]
+    public GameObject warningUI; // Assign parent GameObject containing both texts
+    public TextMeshProUGUI countdownText; // Assign in the Inspector
+
     private PlayerHealth playerHealth;
     private bool isOutsideTilemap = false;
     private float outsideTimer = 0f;
@@ -16,6 +21,12 @@ public class OutOfBoundsHandler : MonoBehaviour
     void Start()
     {
         playerHealth = GetComponent<PlayerHealth>();
+
+        // Disable UI at the start
+        if (warningUI != null)
+        {
+            warningUI.SetActive(false);
+        }
     }
 
     void Update()
@@ -31,7 +42,7 @@ public class OutOfBoundsHandler : MonoBehaviour
         if (tilemapCollider != null)
         {
             // Player is inside tilemap → Reset everything
-            if (isOutsideTilemap) 
+            if (isOutsideTilemap)
             {
                 Debug.Log("Player re-entered the tilemap. Resetting health drain.");
             }
@@ -39,22 +50,41 @@ public class OutOfBoundsHandler : MonoBehaviour
             isOutsideTilemap = false;
             outsideTimer = 0f;
             healthDrainTimer = 0f; // Stop draining health when player is inside
+
+            // Hide UI
+            if (warningUI != null)
+            {
+                warningUI.SetActive(false);
+            }
         }
         else
         {
             // Player is outside the tilemap
-            if (!isOutsideTilemap) 
+            if (!isOutsideTilemap)
             {
                 Debug.Log("Player left the tilemap. Countdown to health drain started.");
             }
 
             isOutsideTilemap = true;
+
+            // Show UI
+            if (warningUI != null)
+            {
+                warningUI.SetActive(true);
+            }
         }
 
         // If outside, start countdown
         if (isOutsideTilemap)
         {
             outsideTimer += Time.deltaTime;
+
+            // Update countdown text
+            if (countdownText != null)
+            {
+                float timeLeft = Mathf.Max(0, timeBeforeHealthDrain - outsideTimer);
+                countdownText.text = $"Health Drain in: {timeLeft:F1}s";
+            }
 
             // Start health drain after the delay
             if (outsideTimer >= timeBeforeHealthDrain)

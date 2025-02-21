@@ -106,10 +106,16 @@ public class EnemySpawner : MonoBehaviour
 
         Debug.Log(
             $"Enemy destroyed from pool {poolIndex}. Active counts: Pool1: {activePoolOne}, Pool2: {activePoolTwo}");
-        // When both active counts reach zero, notify the WaveManager that Phase One is complete
-        if (activePoolOne <= 0 && activePoolTwo <= 0)
+
+        // Only consider a pool complete if its total count is nonzero,
+        // otherwise treat it as already completed.
+        bool poolOneComplete = (poolOneCount == 0) || (activePoolOne <= 0 && spawnedTotalPoolOne >= poolOneCount);
+        bool poolTwoComplete = (poolTwoCount == 0) || (activePoolTwo <= 0 && spawnedTotalPoolTwo >= poolTwoCount);
+
+        if (poolOneComplete && poolTwoComplete)
         {
             FindObjectOfType<WaveManager>().OnWavePhaseOneComplete();
         }
     }
+
 }
