@@ -4,6 +4,7 @@ public class ObjectSwitcher : MonoBehaviour
 {
     public GameObject turretButtonUI; // ✅ Assign in Inspector
     private bool isPathfinderActive = true; // ✅ Tracks the original state
+    public GameObject requiredTileUI;
 
     void OnEnable()
     {
@@ -30,17 +31,22 @@ public class ObjectSwitcher : MonoBehaviour
 
     void ToggleObjects()
     {
-        // Toggle the `placeAble` state in TilemapAStarPathfinder
+        // Toggle placeAble state
         TilemapAStarPathfinder.placeAble = !TilemapAStarPathfinder.placeAble;
 
-        // Toggle UI visibility
+        // Toggle UI visibility based on the new state
         if (turretButtonUI != null)
         {
             turretButtonUI.SetActive(!TilemapAStarPathfinder.placeAble);
         }
 
-        Debug.Log($"Toggled: placeAble = {TilemapAStarPathfinder.placeAble}, UI Active = {!TilemapAStarPathfinder.placeAble}");
+        // Ensure requiredTileUI also follows the toggle logic
+        if (requiredTileUI != null)
+        {
+            requiredTileUI.SetActive(TilemapAStarPathfinder.placeAble && isPathfinderActive);
+        }
     }
+
 
     /// <summary>
     /// Disables pathfinder and prevents toggling during a wave.
@@ -50,6 +56,7 @@ public class ObjectSwitcher : MonoBehaviour
         isPathfinderActive = false;
         TilemapAStarPathfinder.placeAble = false; // ✅ Prevent placement
         if (turretButtonUI != null) turretButtonUI.SetActive(false); // ✅ Hide UI
+        requiredTileUI.SetActive(false);
 
         Debug.Log("Pathfinder disabled: Wave started.");
     }
@@ -61,8 +68,15 @@ public class ObjectSwitcher : MonoBehaviour
     {
         isPathfinderActive = true;
         TilemapAStarPathfinder.placeAble = true; // ✅ Allow placement again
-        if (turretButtonUI != null) turretButtonUI.SetActive(true); // ✅ Show UI
+    
+        if (turretButtonUI != null) 
+            turretButtonUI.SetActive(true); // ✅ Show UI
+
+        // Ensure requiredTileUI is NOT enabled when the wave ends
+        if (requiredTileUI != null) 
+            requiredTileUI.SetActive(false); 
 
         Debug.Log("Pathfinder enabled: Wave ended.");
     }
+
 }

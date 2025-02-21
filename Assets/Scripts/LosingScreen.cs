@@ -1,25 +1,20 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements; // UI Toolkit
 
 public class LosingScreen : MonoBehaviour
 {
-    public Image _image;
+    public string sceneToLoad = "MainMenu";
 
     void OnEnable()
     {
         TowerHealth.OnTowerDestroyed += ShowLosingScreen;
         PlayerHealth.OnPlayerDeath += ShowLosingScreen;
     }
-
-    void Start()
-    {
-        _image = GetComponent<Image>();
-    }
-
+    
     void ShowLosingScreen()
     {
-        _image.style.opacity = 1f; // 1 = 100% visible
-        Debug.Log("You lost!");
+        SceneManager.LoadScene(sceneToLoad);
     }
 
     void OnDestroy()

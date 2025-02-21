@@ -1,9 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Turret : MonoBehaviour, IDamageable
 {
+    [Header("Miscellaneous Settings")] public GameObject healthUI;
+    public ParticleSystem deadParticle;
+    
     [Header("Turret Settings")]
     public float health = 100;
     public GameObject rewardPrefab;
@@ -24,14 +29,20 @@ public class Turret : MonoBehaviour, IDamageable
     public float rotationSpeed = 5f; // How fast the turret rotates
     public float rotationThreshold = 5f; // Angle (in degrees) within which the turret is considered "aimed" at the target
 
+    [Header("Health UI")]
+    public Image healthBar; // Assign in the Inspector
+
     private List<GameObject> bulletPool;
     private float nextFireTime;
     private Transform target; // Enemy target
 
     void Start()
     {
+        deadParticle.Stop();
+        deadParticle.Stop();
         InitializeBulletPool();
         currentBullets = maxBulletsPerReload;
+        UpdateHealthUI();
     }
 
     void Update()
@@ -72,8 +83,11 @@ public class Turret : MonoBehaviour, IDamageable
     public void TakeDamage(float damage)
     {
         health -= damage;
+        UpdateHealthUI(); // Updates health bar when turret takes damage
+
         if (health <= 0)
         {
+            deadParticle.Play();
             Die();
         }
     }
@@ -83,6 +97,7 @@ public class Turret : MonoBehaviour, IDamageable
         if (rewardPrefab != null)
         {
             Instantiate(rewardPrefab, transform.position, Quaternion.identity);
+            healthUI.SetActive(false);
         }
         gameObject.SetActive(false); // Simulate destruction.
     }
@@ -124,10 +139,8 @@ public class Turret : MonoBehaviour, IDamageable
         if (bullet != null)
         {
             bullet.transform.position = firePoint.position;
-            // Set bullet rotation to the firePoint's rotation so it travels straight.
             bullet.transform.rotation = firePoint.rotation;
             bullet.SetActive(true);
-            // Note: Removed the SetTarget call to ensure the bullet travels in a straight line.
         }
     }
 
@@ -162,5 +175,13 @@ public class Turret : MonoBehaviour, IDamageable
         currentBullets = maxBulletsPerReload;
         isReloading = false;
         Debug.Log("Reload Complete!");
+    }
+
+    void UpdateHealthUI()
+    {
+        if (healthBar != null)
+        {
+            healthBar.fillAmount = health / 100f;
+        }
     }
 }

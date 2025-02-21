@@ -1,15 +1,15 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using TMPro; // ✅ Import TextMeshPro
+using TMPro;
 
 public class WaveManager : MonoBehaviour
 {
     [System.Serializable]
     public class Wave
     {
-        public int poolOneCount; // ✅ Rename as "Minions"
-        public int poolTwoCount; // ✅ Rename as "Tanks"
+        public int poolOneCount; // Renamed as "Minions"
+        public int poolTwoCount; // Renamed as "Tanks"
         public float phaseTwoDelay = 2f;
         public float phaseTwoDuration = 10f;
 
@@ -21,34 +21,41 @@ public class WaveManager : MonoBehaviour
 
     [Header("Wave Settings")]
     public Wave[] waves;
-    private int currentWaveIndex = 0; // ✅ Start at Wave 1 (0-based index)
+    private int currentWaveIndex = 0; // 0-based index (Wave 1)
     private bool waveReady = true;
     private bool phaseTwoActive = false;
-    private int timeLeft; // ✅ Track time left in Phase 2 (now an int)
+    private int timeLeft; // Time left in Phase 2
 
     [Header("References")]
     public EnemySpawner enemySpawner;
-    public TMP_Text waveNumberText; // ✅ Text for wave number
-    public TMP_Text unitCountText;  // ✅ Text for Minions & Tanks count
+    public TMP_Text waveNumberText; // Displays wave number
+    public TMP_Text enemyCountText;  // Displays Minions & Tanks count
+    public TMP_Text timeLeftText;    // Displays the countdown during Phase Two
+
+    [Header("Wave Error UI")]
+    public TMP_Text waveErrorText; // Error text for wave errors
+    public Animator waveErrorAnimator; // Animator for error UI (should have bool parameter "isError")
 
     public static event Action OnWaveStart;
     public static event Action OnPhaseOneComplete;
     public static event Action OnWaveEnd;
 
     /// <summary>
-    /// UI Button OnClick() to start the **next wave in order**.
+    /// UI Button OnClick() to start the next wave.
     /// </summary>
     public void StartWaveFromButton()
     {
+        // If the required tile path is not valid, show error and do not start wave.
         if (!TilemapAStarPathfinder.pathValid)
         {
-            Debug.LogWarning("Wave cannot start! Path validation failed.");
+            ShowWaveError("Not enough TILES REQUIRED");
             return;
         }
+        // Otherwise clear any previous error.
+        ClearWaveError();
 
         if (currentWaveIndex >= waves.Length)
         {
-            Debug.LogWarning("No more waves left. Game Completed!");
             return;
         }
 
@@ -59,32 +66,29 @@ public class WaveManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Wave cannot start yet! Previous wave is still active.");
+            // You can add additional logic here if needed.
         }
     }
 
     /// <summary>
-    /// Updates TMP texts for the next wave (before pressing Start Wave).
+    /// Updates TMP texts for the next wave.
     /// </summary>
     private void UpdateWaveUI()
     {
         if (waveNumberText != null)
-            waveNumberText.text = $"Wave {currentWaveIndex + 1}"; // ✅ Update wave number TMP
+            waveNumberText.text = $"{currentWaveIndex + 1}";
 
-        if (unitCountText != null && currentWaveIndex < waves.Length)
+        if (enemyCountText != null && currentWaveIndex < waves.Length)
         {
             Wave selectedWave = waves[currentWaveIndex];
-            unitCountText.text = $"Minions: {selectedWave.poolOneCount}\nTanks: {selectedWave.poolTwoCount}"; // ✅ Update Minions & Tanks count TMP
+            enemyCountText.text = $"{selectedWave.poolOneCount}\n{selectedWave.poolTwoCount}";
         }
     }
 
-    /// <summary>
-    /// Starts the **next wave in order**.
-    /// </summary>
     private void Start()
     {
         waveReady = true;
-        UpdateWaveUI(); // ✅ Update UI at game start
+        UpdateWaveUI();
     }
 
     private IEnumerator StartWave(int waveIndex)
@@ -104,10 +108,12 @@ public class WaveManager : MonoBehaviour
         OnWaveStart?.Invoke();
 
         enemySpawner.StartWave(selectedWave.poolOneCount, selectedWave.poolTwoCount);
+
+        yield break;
     }
 
     /// <summary>
-    /// Called when **Phase 1 ends (all enemies cleared)**.
+    /// Called when Phase 1 ends (all enemies cleared).
     /// </summary>
     public void OnWavePhaseOneComplete()
     {
@@ -120,7 +126,7 @@ public class WaveManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Starts Phase 2 with a delay and automatically ends the wave after duration.
+    /// Starts Phase 2 after a delay and runs a countdown.
     /// </summary>
     private IEnumerator StartPhaseTwo(float delay, float duration)
     {
@@ -128,9 +134,9 @@ public class WaveManager : MonoBehaviour
         Debug.Log($"Phase 2 started for Wave {currentWaveIndex + 1}, lasting {duration} seconds.");
 
         phaseTwoActive = true;
-        timeLeft = Mathf.CeilToInt(duration); // ✅ Convert duration to an integer for countdown
+        timeLeft = Mathf.CeilToInt(duration);
 
-        StartCoroutine(UpdatePhaseTwoUI()); // ✅ Start updating UI every second
+        StartCoroutine(UpdatePhaseTwoUI());
 
         while (timeLeft > 0)
         {
@@ -142,23 +148,23 @@ public class WaveManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Updates TMP UI every second to show remaining survival time.
+    /// Updates UI every second to show the remaining time in Phase 2.
     /// </summary>
     private IEnumerator UpdatePhaseTwoUI()
     {
         while (phaseTwoActive && timeLeft > 0)
         {
-            if (unitCountText != null)
+            if (timeLeftText != null)
             {
-                unitCountText.text = $"Survive for: {timeLeft} seconds"; // ✅ Display rounded countdown
+                timeLeftText.text = $"{timeLeft} seconds";
             }
-
             yield return new WaitForSeconds(1f);
         }
     }
 
     /// <summary>
-    /// Ends the wave and **automatically prepares the next wave**.
+    /// Ends the wave and automatically prepares for the next wave.
+    /// This is your original final function, which has been preserved.
     /// </summary>
     private void EndWave()
     {
@@ -168,16 +174,39 @@ public class WaveManager : MonoBehaviour
 
         OnWaveEnd?.Invoke();
 
-        // ✅ Move to the next wave ONLY if it's not the last wave
         if (currentWaveIndex + 1 < waves.Length)
         {
             currentWaveIndex++;
-            UpdateWaveUI(); // ✅ Update UI for the next wave
+            UpdateWaveUI();
             Debug.Log($"Next wave is Wave {currentWaveIndex + 1}. Press the button to start.");
         }
         else
         {
             Debug.Log("All waves completed! No more waves left.");
         }
+    }
+
+    // Helper functions to update the wave error UI
+    void ShowWaveError(string msg)
+    {
+        if (waveErrorText != null)
+            waveErrorText.text = msg;
+
+        if (waveErrorAnimator != null)
+            waveErrorAnimator.SetBool("isError", true);
+        StartCoroutine(swithcOffAnimation());
+    }
+
+    void ClearWaveError()
+    {
+        if (waveErrorText != null)
+            waveErrorText.text = "";
+    }
+
+    IEnumerator swithcOffAnimation()
+    {
+        yield return new WaitForSeconds(0.2f);
+        if (waveErrorAnimator != null)
+            waveErrorAnimator.SetBool("isError", false);
     }
 }

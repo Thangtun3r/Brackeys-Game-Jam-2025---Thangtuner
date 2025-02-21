@@ -1,14 +1,20 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemyHealth : MonoBehaviour, IDamageable
 {
     [HideInInspector]
     public bool hasBeenCounted = false;
+
     [Header("Enemy Health Settings")]
     public float maxHealth = 100;
     private float currentHealth;
 
-    [Header("Enemy AI Settings")] public int coinValue = 1;
+    [Header("Enemy AI Settings")] 
+    public int coinValue = 1;
+
+    [Header("UI Settings")]
+    public Image healthBar; // Assign this in the Inspector
 
     private EnemyAIPathFollower aiPathFollower;
     private int poolIndex;
@@ -25,12 +31,16 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     {
         currentHealth = maxHealth;
         aiPathFollower = GetComponent<EnemyAIPathFollower>();
+        UpdateHealthUI();
     }
 
     public void TakeDamage(float damage)
     {
         currentHealth -= damage;
         Debug.Log($"{gameObject.name} took {damage} damage. Remaining health: {currentHealth}");
+
+        UpdateHealthUI(); // Update UI when taking damage
+
         if (currentHealth <= 0)
         {
             Die();
@@ -40,6 +50,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     private void Die()
     {
         ResourceManager.Instance.AddCoins(coinValue);
+
         if (!hasBeenCounted)
         {
             hasBeenCounted = true;
@@ -49,6 +60,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
                 spawner.EnemyDestroyed(poolIndex);
             }
         }
+
         EnemyObjectPool enemyPool = FindObjectOfType<EnemyObjectPool>();
         if (enemyPool != null)
         {
@@ -65,6 +77,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         currentHealth = maxHealth;
         isPartOfWave = true;
         hasBeenCounted = false;
+        UpdateHealthUI();
     }
 
     public void SetPoolIndex(int index)
@@ -72,4 +85,11 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         poolIndex = index;
     }
 
+    private void UpdateHealthUI()
+    {
+        if (healthBar != null)
+        {
+            healthBar.fillAmount = currentHealth / maxHealth;
+        }
+    }
 }

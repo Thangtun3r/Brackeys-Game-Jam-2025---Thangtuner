@@ -35,10 +35,14 @@ public class TurretPlacementManager : MonoBehaviour
     
     // Remove the preview object when this component is disabled
     private void OnDisable() {
-        if (currentPreview != null)
-        {
-            Destroy(currentPreview);
-            currentPreview = null;
+        if (currentPreview != null) {
+            currentPreview.SetActive(false);
+        }
+    }
+
+    private void OnEnable() {
+        if (currentPreview != null) {
+            currentPreview.SetActive(true);
         }
     }
 
