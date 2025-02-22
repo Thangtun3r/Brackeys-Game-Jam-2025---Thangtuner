@@ -1,101 +1,103 @@
+using System.Collections;
 using UnityEngine;
 using TMPro;
 
 public class OutOfBoundsHandler : MonoBehaviour
 {
-    [Header("Out-of-Bounds Settings")]
-    public LayerMask tilemapLayer; // Assign the Tilemap Layer in the Inspector
-    public float timeBeforeHealthDrain = 3f; // Time before health starts draining
-    public float healthDrainInterval = 1f; // Time between each health loss
-    public int healthDrainAmount = 1; // Health lost per interval
+    [Header("Health Drain Settings")]
+    public LayerMask pathTileLayer;
+    public float drainDelay = 3f;
+    public float drainInterval = 1f;
+    public float damagePerTick = 10f;
+   
+    [Header("Warning UI")]
+    public TextMeshProUGUI warningText;       
+    
+    private PlayerHealth playerHealth;         // Reference to the player’s health component.
+    private bool isOffPath = false;              // Whether the child object is off the pathtile.
+    private float timer = 0f;                    // Countdown timer.
+    private bool draining = false;               // Whether the drain coroutine is running.
 
-    [Header("UI Warning")]
-    public GameObject warningUI; // Assign parent GameObject containing both texts
-    public TextMeshProUGUI countdownText; // Assign in the Inspector
-
-    private PlayerHealth playerHealth;
-    private bool isOutsideTilemap = false;
-    private float outsideTimer = 0f;
-    private float healthDrainTimer = 0f;
-
-    void Start()
+    void Awake()
     {
-        playerHealth = GetComponent<PlayerHealth>();
+        playerHealth = GetComponentInParent<PlayerHealth>();
+    }
 
-        // Disable UI at the start
-        if (warningUI != null)
-        {
-            warningUI.SetActive(false);
-        }
+    void OnEnable()
+    {
+        ResetDrainState();
+    }
+
+    void ResetDrainState()
+    {
+        timer = 0f;
+        isOffPath = false;
+        draining = false;
+        if (warningText != null)
+            warningText.gameObject.SetActive(false);
     }
 
     void Update()
     {
-        CheckTilemapBounds();
+        if (isOffPath)
+        {
+            timer += Time.deltaTime;
+        
+            if (warningText != null)
+            {
+                if (timer >= drainDelay)
+                {
+                    warningText.text = "RETURN TO SAFE PATH NOW! HEALTH IS DRAINING...";
+                }
+                else
+                {
+                    float remaining = Mathf.Max(drainDelay - timer, 0f);
+                    warningText.text = "RETURN TO SAFE PATH NOW! HEALTH DRAIN IN : " + remaining.ToString("F1") + "s";
+                }
+                warningText.gameObject.SetActive(true);
+            }
+        
+            // If the delay has elapsed and we're not already draining, start health drain.
+            if (timer >= drainDelay && !draining)
+            {
+                StartCoroutine(DrainHealth());
+            }
+        }
     }
 
-    void CheckTilemapBounds()
+    IEnumerator DrainHealth()
     {
-        // Check if the player is inside the tilemap
-        Collider2D tilemapCollider = Physics2D.OverlapPoint(transform.position, tilemapLayer);
-
-        if (tilemapCollider != null)
+        draining = true;
+        while (isOffPath)
         {
-            // Player is inside tilemap → Reset everything
-            if (isOutsideTilemap)
-            {
-                Debug.Log("Player re-entered the tilemap. Resetting health drain.");
-            }
-
-            isOutsideTilemap = false;
-            outsideTimer = 0f;
-            healthDrainTimer = 0f; // Stop draining health when player is inside
-
-            // Hide UI
-            if (warningUI != null)
-            {
-                warningUI.SetActive(false);
-            }
+            // Drain the player's health.
+            playerHealth.TakeDamage(damagePerTick);
+            yield return new WaitForSeconds(drainInterval);
         }
-        else
+        draining = false;
+    }
+
+    // For 2D collisions; if you're using 3D, use OnTriggerEnter/Exit (without the 2D suffix).
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        // Check if the collider belongs to a pathtile.
+        if (((1 << collision.gameObject.layer) & pathTileLayer) != 0)
         {
-            // Player is outside the tilemap
-            if (!isOutsideTilemap)
-            {
-                Debug.Log("Player left the tilemap. Countdown to health drain started.");
-            }
-
-            isOutsideTilemap = true;
-
-            // Show UI
-            if (warningUI != null)
-            {
-                warningUI.SetActive(true);
-            }
+            // Player re-enters the path: stop draining and reset the timer.
+            isOffPath = false;
+            timer = 0f;
+            if (warningText != null)
+                warningText.gameObject.SetActive(false);
         }
+    }
 
-        // If outside, start countdown
-        if (isOutsideTilemap)
+    void OnTriggerExit2D(Collider2D collision)
+    {
+        // When exiting a pathtile, mark the state as off the path and reset the timer.
+        if (((1 << collision.gameObject.layer) & pathTileLayer) != 0)
         {
-            outsideTimer += Time.deltaTime;
-
-            // Update countdown text
-            if (countdownText != null)
-            {
-                float timeLeft = Mathf.Max(0, timeBeforeHealthDrain - outsideTimer);
-                countdownText.text = $"Health Drain in: {timeLeft:F1}s";
-            }
-
-            // Start health drain after the delay
-            if (outsideTimer >= timeBeforeHealthDrain)
-            {
-                healthDrainTimer += Time.deltaTime;
-                if (healthDrainTimer >= healthDrainInterval)
-                {
-                    playerHealth.TakeDamage(healthDrainAmount);
-                    healthDrainTimer = 0f; // Reset health drain timer
-                }
-            }
+            isOffPath = true;
+            timer = 0f;
         }
     }
 }

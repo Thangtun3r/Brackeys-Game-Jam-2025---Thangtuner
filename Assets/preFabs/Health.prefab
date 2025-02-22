@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 9105202352459123177}
   - component: {fileID: -5834277166903195621}
   - component: {fileID: -2171204609242868377}
+  - component: {fileID: 3145625170279431596}
   m_Layer: 0
   m_Name: Health
   m_TagString: Untagged
@@ -162,3 +163,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &3145625170279431596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4156062537451901868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09b136725f6bd0547b203b91647443bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floatAmount: 0.5
+  floatDuration: 1
+  floatEase: 4

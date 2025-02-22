@@ -12,6 +12,7 @@ public class HealthPoint : MonoBehaviour
         IHealable healable = other.GetComponent<IHealable>();
         if (healable != null)
         {
+            FMODUnity.RuntimeManager.PlayOneShot("event:/Heath", transform.position);
             healable.Heal(healthPoint);
             Destroy(gameObject);
         }

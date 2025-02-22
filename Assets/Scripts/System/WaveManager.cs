@@ -50,7 +50,7 @@ public class WaveManager : MonoBehaviour
         // If the required tile path is not valid, show error and do not start wave.
         if (!TilemapAStarPathfinder.pathValid)
         {
-            ShowWaveError("Not enough TILES REQUIRED");
+            ShowWaveError("Not enough TILES REQUIRED!");
             return;
         }
         // Otherwise clear any previous error.
@@ -134,24 +134,34 @@ public class WaveManager : MonoBehaviour
     /// <summary>
     /// Starts Phase 2 after a delay and runs a countdown.
     /// </summary>
-    private IEnumerator StartPhaseTwo(float delay, float duration)
+ private IEnumerator StartPhaseTwo(float delay, float duration)
+{
+    // Wait for the delay first
+    yield return new WaitForSeconds(delay);
+    Debug.Log($"Phase 2 started, lasting {duration} seconds.");
+
+    phaseTwoActive = true;
+    timeLeft = Mathf.CeilToInt(duration);
+
+    // Single loop handles both time decrement and UI
+    while (timeLeft > 0)
     {
-        yield return new WaitForSeconds(delay);
-        Debug.Log($"Phase 2 started for Wave {currentWaveIndex + 1}, lasting {duration} seconds.");
-
-        phaseTwoActive = true;
-        timeLeft = Mathf.CeilToInt(duration);
-
-        StartCoroutine(UpdatePhaseTwoUI());
-
-        while (timeLeft > 0)
+        // Update the text
+        if (timeLeftText != null)
         {
-            yield return new WaitForSeconds(1f);
-            timeLeft--;
+            timeLeftText.text = $"{timeLeft} seconds";
         }
 
-        EndWave();
+        // Wait 1 second
+        yield return new WaitForSeconds(1f);
+
+        // Decrement
+        timeLeft--;
     }
+
+    EndWave();
+}
+
 
     /// <summary>
     /// Updates UI every second to show the remaining time in Phase 2.

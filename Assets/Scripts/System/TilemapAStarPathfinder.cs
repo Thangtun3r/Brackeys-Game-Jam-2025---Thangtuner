@@ -87,19 +87,19 @@ public class TilemapAStarPathfinder : MonoBehaviour
                 // Check for invalid configurations.
                 if (Has2x2Block(tempCells))
                 {
-                    ShowError("Invalid: creates a 2x2 block.");
+                    ShowError("Cannot create a 2x2 block.");
                     return;
                 }
 
                 if (HasIntersection(tempCells))
                 {
-                    ShowError("Invalid: creates an intersection.");
+                    ShowError("No intersection !");
                     return;
                 }
 
                 if (!IsContiguous(tempCells))
                 {
-                    ShowError("Invalid: path is not contiguous.");
+                    ShowError("Path must be continous !");
                     return;
                 }
 
@@ -111,6 +111,7 @@ public class TilemapAStarPathfinder : MonoBehaviour
                 // Trigger spawn particle effect at the tile's center.
                 if (spawnEffect != null)
                 {
+                    FMODUnity.RuntimeManager.PlayOneShot("event:/PlaceTiles", transform.position);
                     Vector3 cellCenter = overlayTilemap.GetCellCenterWorld(cellPos);
                     ParticleSystem effect = Instantiate(spawnEffect, cellCenter, Quaternion.identity);
                     effect.Play();
@@ -134,6 +135,7 @@ public class TilemapAStarPathfinder : MonoBehaviour
                 // Trigger removal particle effect at the tile's center.
                 if (removeEffect != null)
                 {
+                    FMODUnity.RuntimeManager.PlayOneShot("event:/PlaceTiles", transform.position);
                     Vector3 cellCenter = overlayTilemap.GetCellCenterWorld(cellPos);
                     ParticleSystem effect = Instantiate(removeEffect, cellCenter, Quaternion.identity);
                     effect.Play();
@@ -159,7 +161,7 @@ public class TilemapAStarPathfinder : MonoBehaviour
         if (!IsContiguous(paintedCells))
         {
             pathValid = false;
-            ShowError("Invalid final path: not contiguous.");
+            ShowError("Path not continous");
             if (towerHealthObject != null)
                 towerHealthObject.SetActive(false);
             if (startTileObject != null)

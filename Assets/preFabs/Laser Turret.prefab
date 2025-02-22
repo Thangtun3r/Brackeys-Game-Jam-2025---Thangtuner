@@ -5964,6 +5964,8 @@ MonoBehaviour:
   health: 100
   rewardPrefab: {fileID: 4156062537451901868, guid: 20f92af19278db24a94ddde6245a4cd4, type: 3}
   healthBar: {fileID: 3992292566377200321}
+  laserLoopEvent: event:/Laser
+  overheatOneShotEvent: event:/Laser Overheated
 --- !u!120 &5911930713478578366
 LineRenderer:
   serializedVersion: 2

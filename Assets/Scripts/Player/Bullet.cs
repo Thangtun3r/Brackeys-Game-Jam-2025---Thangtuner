@@ -24,6 +24,7 @@ public class Bullet : MonoBehaviour
         IDamageable damageable = other.GetComponent<IDamageable>();
         if (damageable != null)
         {
+            FMODUnity.RuntimeManager.PlayOneShot("event:/Bullet Hit", transform.position);
             damageable.TakeDamage(damage);
         }
 

@@ -31,6 +31,7 @@ public class ObjectSwitcher : MonoBehaviour
 
     void ToggleObjects()
     {
+        FMODUnity.RuntimeManager.PlayOneShot("event:/ClickSound"); // ✅ Play FMOD sound
         // Toggle placeAble state
         TilemapAStarPathfinder.placeAble = !TilemapAStarPathfinder.placeAble;
 

@@ -10,12 +10,10 @@ public class PlayerStaging : MonoBehaviour
     public GameObject vcam;
     public MonoBehaviour playerMovement; // Reference to the player movement script
     public TilemapAStarPathfinder pathfinder; // Reference to the A* pathfinder script
-    public MonoBehaviour playerBorderDetection;
 
     private void OnEnable()
     {
         playerMovement.enabled = false;
-        playerBorderDetection.enabled = false;
         // Check if the pathfinder reference is set
         if (pathfinder != null && pathfinder.startTileObject != null)
         {
@@ -39,7 +37,6 @@ public class PlayerStaging : MonoBehaviour
         yield return new WaitForSeconds(delayTime);
         playerMovement.enabled = true;
         gameObject.tag = "Damageable";
-        playerBorderDetection.enabled = true;
     }
 }
 

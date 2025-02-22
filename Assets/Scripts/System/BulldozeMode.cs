@@ -6,7 +6,7 @@ using UnityEngine;
 public class BulldozeMode : MonoBehaviour
 {
     public static bool bulldozeMode = false;
-    public Animator bullDozAnimator; // Reference to the Animator
+    public GameObject bullDozeUI;
     public GameObject turretButtons;
 
     private void Update()
@@ -14,19 +14,20 @@ public class BulldozeMode : MonoBehaviour
         Bulldoze();
     }
 
+    private void Start()
+    {
+        bullDozeUI.SetActive(false);
+    }
+
     private void Bulldoze()
     {
         if (Input.GetKeyDown(KeyCode.B))
         {
+            FMODUnity.RuntimeManager.PlayOneShot("event:/ClickSound");
             bulldozeMode = !bulldozeMode;
 
-            // Toggle animator's isBulldoze parameter instead of setting active/inactive
-            if (bullDozAnimator != null)
-            {
-                bullDozAnimator.SetBool("isBulldoze", bulldozeMode);
-            }
+            bullDozeUI.SetActive(!bullDozeUI.activeSelf);
 
-            // Toggle turret buttons visibility
             if (turretButtons != null)
             {
                 turretButtons.SetActive(!turretButtons.activeSelf);

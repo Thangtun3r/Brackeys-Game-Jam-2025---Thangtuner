@@ -6,8 +6,14 @@ using UnityEngine.UI;
 
 public class Turret : MonoBehaviour, IDamageable
 {
+    [Header("FMOD Settings")]
+    public string shootingSound = "event:/Turret/TurretShoot";
+    public string deathSound = "event:/Turret/TurretDeath";
+    
     [Header("Miscellaneous Settings")] public GameObject healthUI;
     public ParticleSystem deadParticle;
+    public ParticleSystem shootingParticle;
+    public ParticleSystem placedParticle;
     
     [Header("Turret Settings")]
     public float health = 100;
@@ -39,7 +45,7 @@ public class Turret : MonoBehaviour, IDamageable
     void Start()
     {
         deadParticle.Stop();
-        deadParticle.Stop();
+        shootingParticle.Stop();
         InitializeBulletPool();
         currentBullets = maxBulletsPerReload;
         UpdateHealthUI();
@@ -66,6 +72,8 @@ public class Turret : MonoBehaviour, IDamageable
             {
                 if (Time.time >= nextFireTime && currentBullets > 0)
                 {
+                    FMODUnity.RuntimeManager.PlayOneShot(shootingSound, transform.position);
+                    shootingParticle.Play();
                     Shoot();
                     nextFireTime = Time.time + 1f / fireRate;
                     currentBullets--;
@@ -87,6 +95,7 @@ public class Turret : MonoBehaviour, IDamageable
 
         if (health <= 0)
         {
+            FMODUnity.RuntimeManager.PlayOneShot(deathSound, transform.position);
             deadParticle.Play();
             Die();
         }

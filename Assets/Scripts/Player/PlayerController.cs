@@ -3,6 +3,9 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("fmod")]
+    public string shotSound = "event:/Shot";
+    
     [Header("Player Settings")]
     public float moveSpeed = 5f;
     public Transform aimIndicator;
@@ -82,6 +85,7 @@ public class PlayerController : MonoBehaviour
         {
             if (Time.time >= nextFireTime)
             {
+                
                 Shoot();
                 nextFireTime = Time.time + fireRate;
             }
@@ -90,6 +94,7 @@ public class PlayerController : MonoBehaviour
 
     void Shoot()
     {
+        FMODUnity.RuntimeManager.PlayOneShot(shotSound, transform.position);
         GameObject bullet = bulletPool.GetPooledObject();
         if (bullet)
         {

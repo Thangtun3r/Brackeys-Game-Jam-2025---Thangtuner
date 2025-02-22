@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class TowerHealth : MonoBehaviour, IDamageable
 {
@@ -9,6 +10,7 @@ public class TowerHealth : MonoBehaviour, IDamageable
     public static Action OnTowerDestroyed;
     public event Action<float, float> OnHealthChanged; // Added event for UI updates
     public TextMeshProUGUI healthText;
+    public string gameOverScene = "GameOver"; // Add the name of the scene to load on death
 
     private void Start()
     {
@@ -21,9 +23,15 @@ public class TowerHealth : MonoBehaviour, IDamageable
         currentHealth -= damage;
         if (currentHealth <= 0)
         {
-            OnTowerDestroyed?.Invoke();
+            Die();
         }
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
+    private void Die()
+    {
+        OnTowerDestroyed?.Invoke();
+        SceneManager.LoadScene(gameOverScene); // Load the specified scene
     }
 
     public float GetCurrentHealth() => currentHealth;
